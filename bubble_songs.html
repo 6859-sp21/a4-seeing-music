@@ -14,13 +14,15 @@
       // Load data from a URL. You can also have the json file downloaded.
       // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
       d3.csv("data/data.csv").then((allData) => {
-      // Filter top 10 songs
-      var topData = allData.sort(function(a, b) {
+
+      // Filter top 10 songs of 2020
+      const year = '2018';
+      const yearData = allData.filter(d => d.year === year);
+
+      var data = yearData.sort(function(a, b) {
         return d3.descending(+a.popularity, +b.popularity);
       }).slice(0, 10);
-      // Filter year
-      const year = 2020;
-      const data = topData.filter(d => d.year === year);
+
 
       // Setting up variables that describe chart space
       const height = 400;
@@ -28,8 +30,10 @@
       const margin = ({top: 10, right: 10, bottom: 20, left: 20});
 
       var diameter = 600;
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var color = d3.scaleOrdinal(d3.schemeDark2);
 
+      //data =  d3.hierarchy().sum(d => d.popularity);
+      
       var bubble = d3.pack(data)
           .size([diameter, diameter])
           .padding(1.5);
@@ -39,9 +43,9 @@
           .attr("width", diameter)
           .attr("height", diameter)
           .attr("class", "bubble");
-
-      var nodes = d3.hierarchy(data)
-          .sum(function(d) { return d.popularity; });
+      
+      var nodes = d3.hierarchy({children: data})
+          .sum(function(d) {return d.popularity; });
 
       var node = svg.selectAll(".node")
           .data(bubble(nodes).descendants())
@@ -54,46 +58,47 @@
           .attr("transform", function(d) {
               return "translate(" + d.x + "," + d.y + ")";
           });
+        
+      node.append("title")
+          .text(function(d) {
+              return d.data.name + ": " + d.data.popularity;
+          });
 
-      // node.append("title")
-      //     .text(function(d) {
-      //         return d.name + ": " + d.popularity;
-      //     });
+      node.append("circle")
+          .attr("r", function(d) {
+              return d.r;
+          })
+          .style("fill", function(d,i) {
+              console.log(color(i));
+              return color(i);
+          });
 
-      // node.append("circle")
-      //     .attr("r", function(d) {
-      //         return d.r;
-      //     })
-      //     .style("fill", function(d,i) {
-      //         return color(i);
-      //     });
+      node.append("text")
+          .attr("dy", ".2em")
+          .style("text-anchor", "middle")
+          .text(function(d) {
+              return d.data.popularity
+          })
+          .attr("font-family", "sans-serif")
+          .attr("font-size", function(d){
+              return d.r/5;
+          })
+          .attr("fill", "pink");
 
-      // node.append("text")
-      //     .attr("dy", ".2em")
-      //     .style("text-anchor", "middle")
-      //     .text(function(d) {
-      //         return d.data.name.substring(0, d.r / 3);
-      //     })
-      //     .attr("font-family", "sans-serif")
-      //     .attr("font-size", function(d){
-      //         return d.r/5;
-      //     })
-      //     .attr("fill", "white");
+      node.append("text")
+          .attr("dy", "1.3em")
+          .style("text-anchor", "middle")
+          .text(function(d) {
+              return d.data.name;
+          })
+          .attr("font-family",  "Gill Sans", "Gill Sans MT")
+          .attr("font-size", function(d){
+              return d.r/7;
+          })
+          .attr("fill", "black");
 
-      // node.append("text")
-      //     .attr("dy", "1.3em")
-      //     .style("text-anchor", "middle")
-      //     .text(function(d) {
-      //         return d.popularity;
-      //     })
-      //     .attr("font-family",  "Gill Sans", "Gill Sans MT")
-      //     .attr("font-size", function(d){
-      //         return d.r/5;
-      //     })
-      //     .attr("fill", "white");
-
-      // d3.select(self.frameElement)
-      //     .style("height", diameter + "px");
+      d3.select(self.frameElement)
+          .style("height", diameter + "px");
 
       document.getElementById("chart").appendChild(svg.node());
       });
