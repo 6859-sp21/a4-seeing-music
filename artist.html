@@ -6,22 +6,15 @@
   <body>
     <h1>Justin Bieber</h1>
 
-    <div id="chart" > <!--style="width:520px;height:420px;"> -->
+    <div id="chart">
       <!-- This is where we will put our chart. -->
     </div>
 
     <script>
-      var margin = {top: 10, right: 30, bottom: 40, left: 100},
-        width = 460 - margin.left - margin.right,
+      var margin = {top: 10, right: 30, bottom: 40, left: 210},
+        width = 500 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-      var svg = d3.select("chart")
-          .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-          .attr("transform",
-                  "translate(" + margin.left + "," + margin.top + ")");
       // Load data from a URL. You can also have the json file downloaded.
       // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
       d3.csv("data/data.csv").then((allData) => {
@@ -40,162 +33,70 @@
         }
       });
       
-
-    //   var data = artistData.sort(function(a, b) {ow
-    //     return d3.descending(+a.popularity, +b.popularity);
-    //   }).slice(0, 10);
-
-
-      // Setting up variables that describe chart space
-    //   const height = 400;
-    //   const width = 500;
-    //   const margin = ({top: 10, right: 10, bottom: 20, left: 20});
-
-    //   var diameter = 600;
-    //   var color = d3.scaleOrdinal(d3.schemeDark2);
-
-      //data =  d3.hierarchy().sum(d => d.popularity);
+      var svg = d3.select("body")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
       
-    //   var bubble = d3.pack(data)
-    //       .size([diameter, diameter])
-    //       .padding(1.5);
-    // Add X axis
-    var x = d3.scaleLinear()
-        .domain([0, 13000])
-        .range([ 0, width]);
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+      // Add X axis
+      var x = d3.scaleTime()
+          .domain(d3.extent(artistData, function(d){
+            return new Date(d.release_date)
+          }))
+          .range([ 0, width]);
+      svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x))
+          .selectAll("text")
+          .attr("transform", "translate(-10,0)rotate(-45)")
+          .style("text-anchor", "end");
 
-    // Y axis
-    var y = d3.scaleBand()
-        .range([ 0, height ])
-        .domain(artistData.map(function(d) { return d.name; }))
-        .padding(1);
-    svg.append("g")
-        .call(d3.axisLeft(y))
-    
-    // Lines
-    svg.selectAll("myline")
-        .data(artistData)
-        .enter()
-        .append("line")
-        .attr("x1", function(d) { return x(1000); })
-        .attr("x2", x(0))
-        .attr("y1", function(d) { return y(d.name); })
-        .attr("y2", function(d) { return y(d.name); })
-        .attr("stroke", "grey")
-    console.log('here')
-    // Circles
-    svg.selectAll("mycircle")
-        .data(artistData)
-        .enter()
-        .append("circle")
-        .attr("cx", function(d) { return x(1000); })
-        .attr("cy", function(d) { return y(d.name); })
-        .attr("r", "7")
-        .style("fill", "#69b3a2")
-        .attr("stroke", "black")
-    });
+      // Y axis
+      var y = d3.scaleBand()
+          .range([ 0, height ])
+          .domain(artistData.map(function(d) { return d.name; }))
+          .padding(1);
+      svg.append("g")
+          .call(d3.axisLeft(y))
 
-    //   var nodes = d3.hierarchy({children: data})
-    //       .sum(function(d) {return d.popularity; });
+      // min line var
+      var min = new Date(artistData[0].release_date).getTime();
+      for(d in artistData){
+        let curr = new Date(d.release_date).getTime();
+        if(min > curr){
+          min = curr;
+        }
+      }
+      
+      // Lines
+      svg.selectAll("myline")
+          .data(artistData)
+          .enter()
+          .append("line")
+          .attr("x1", function(d) { return x(new Date(d.release_date)); })
+          .attr("x2", x(min))
+          .attr("y1", function(d) { return y(d.name); })
+          .attr("y2", function(d) { return y(d.name); })
+          .attr("stroke", "grey")
 
-    //   var node = svg.selectAll(".node")
-    //       .data(bubble(nodes).descendants())
-    //       .enter()
-    //       .filter(function(d){
-    //           return  !d.children
-    //       })
-    //       .append("g")
-    //       .attr("class", "node")
-    //       .attr("transform", function(d) {
-    //           return "translate(" + d.x + "," + d.y + ")";
-    //       });
-        
-    //   node.append("title")
-    //       .text(function(d) {
-    //           return d.data.name + ": " + d.data.popularity;
-    //       });
+      // Circles
+      svg.selectAll("mycircle")
+          .data(artistData)
+          .enter()
+          .append("circle")
+          .attr("cx", function(d) { return x(new Date(d.release_date)); })
+          .attr("cy", function(d) { return y(d.name); })
+          .attr("r", "7")
+          .style("fill", "#69b3a2")
+          .attr("stroke", "black")
 
-    //   node.append("circle")
-    //       .attr("r", function(d) {
-    //           return d.r;
-    //       })
-    //       .style("fill", function(d,i) {
-    //           console.log(color(i));
-    //           return color(i);
-    //       });
+      document.getElementById("chart").appendChild(svg);
 
-    //   node.append("text")
-    //       .attr("dy", ".2em")
-    //       .style("text-anchor", "middle")
-    //       .text(function(d) {
-    //           return d.data.popularity
-    //       })
-    //       .attr("font-family", "sans-serif")
-    //       .attr("font-size", function(d){
-    //           return d.r/5;
-    //       })
-    //       .attr("fill", "pink");
-
-    //   node.append("text")
-    //       .attr("dy", "1.3em")
-    //       .style("text-anchor", "middle")
-    //       .text(function(d) {
-    //           return d.data.name;
-    //       })
-    //       .attr("font-family",  "Gill Sans", "Gill Sans MT")
-    //       .attr("font-size", function(d){
-    //           return d.r/7;
-    //       })
-    //       .attr("fill", "black");
-
-    //   node.append("title")
-    //       .text(function(d) {
-    //           return d.name + ": " + d.popularity;
-    //       });
-
-    //   node.append("circle")
-    //       .attr("r", function(d) {
-    //           return d.radius;
-    //       })
-    //       .style("fill", function(d,i) {
-    //           return color(i);
-    //       });
-
-    //   node.append("text")
-    //       .attr("dy", ".2em")
-    //       .style("text-anchor", "middle")
-    //       .text(function(d) {
-    //           return d.data.name.substring(0, d.r / 3);
-    //       })
-    //       .attr("font-family", "sans-serif")
-    //       .attr("font-size", function(d){
-    //           return d.r/5;
-    //       })
-    //       .attr("fill", "white");
-
-    //   node.append("text")
-    //       .attr("dy", "1.3em")
-    //       .style("text-anchor", "middle")
-    //       .text(function(d) {
-    //           return d.popularity;
-    //       })
-    //       .attr("font-family",  "Gill Sans", "Gill Sans MT")
-    //       .attr("font-size", function(d){
-    //           return d.r/5;
-    //       })
-    //       .attr("fill", "white");
-
-    //   d3.select(self.frameElement)
-    //       .style("height", diameter + "px");
-
-    //   document.getElementById("chart").appendChild(svg.node());
-    //   });
+      
+      });
   
       </script>
   </body>

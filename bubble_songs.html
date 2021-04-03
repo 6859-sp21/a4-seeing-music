@@ -5,10 +5,14 @@
   </head>
   <body>
     <h1>Bubble</h1>
-
+    <p id="textInput" value=""> Choose year:
+        <output for="mySlider" id="year">1920</output>
+    </p>
+    <input type="range" name="mySlider" id=mySlider min="1920" max="2020" value="50">
     <div id="chart" style="width:520px;height:420px;">
       <!-- This is where we will put our chart. -->
     </div>
+
 
     <script>
       // Load data from a URL. You can also have the json file downloaded.
@@ -16,12 +20,27 @@
       d3.csv("data/data.csv").then((allData) => {
 
       // Filter top 10 songs of 2020
-      const year = '2018';
-      const yearData = allData.filter(d => d.year === year);
+      var year = '1920';
+      d3.select("#mySlider").on("change", function(d){
+          selectedValue = this.value
+          document.getElementById('year').value=selectedValue;
+          
+          year = selectedValue.toString();
+          const yearData = allData.filter(d => d.year === year);
+        var data = yearData.sort(function(a, b) {
+            return d3.descending(+a.popularity, +b.popularity);
+        }).slice(0, 10);
+          update(data);
+        })
 
-      var data = yearData.sort(function(a, b) {
-        return d3.descending(+a.popularity, +b.popularity);
-      }).slice(0, 10);
+        const yearData = allData.filter(d => d.year === year);
+        var data = yearData.sort(function(a, b) {
+            return d3.descending(+a.popularity, +b.popularity);
+        }).slice(0, 10);
+          
+        
+      
+
 
 
       // Setting up variables that describe chart space
@@ -33,7 +52,7 @@
       var color = d3.scaleOrdinal(d3.schemeDark2);
 
       //data =  d3.hierarchy().sum(d => d.popularity);
-      
+     
       var bubble = d3.pack(data)
           .size([diameter, diameter])
           .padding(1.5);
@@ -69,7 +88,6 @@
               return d.r;
           })
           .style("fill", function(d,i) {
-              console.log(color(i));
               return color(i);
           });
 
@@ -97,14 +115,43 @@
           })
           .attr("fill", "black");
 
+      d3.select(self.frameElement)
+          .style("height", diameter + "px");
+        
+      document.getElementById("chart").appendChild(svg.node());
+      
+      function update(data){
+        var oldChild = document.getElementById("chart").lastElementChild;
+        
+        var svg = d3.select("body")
+          .append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter)
+          .attr("class", "bubble");
+      
+      var nodes = d3.hierarchy({children: data})
+          .sum(function(d) {return d.popularity; });
+
+      var node = svg.selectAll(".node")
+          .data(bubble(nodes).descendants())
+          .enter()
+          .filter(function(d){
+              return  !d.children
+          })
+          .append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) {
+              return "translate(" + d.x + "," + d.y + ")";
+          });
+        
       node.append("title")
           .text(function(d) {
-              return d.name + ": " + d.popularity;
+              return d.data.name + ": " + d.data.popularity;
           });
 
       node.append("circle")
           .attr("r", function(d) {
-              return d.radius;
+              return d.r;
           })
           .style("fill", function(d,i) {
               return color(i);
@@ -114,30 +161,33 @@
           .attr("dy", ".2em")
           .style("text-anchor", "middle")
           .text(function(d) {
-              return d.data.name.substring(0, d.r / 3);
+              return d.data.popularity
           })
           .attr("font-family", "sans-serif")
           .attr("font-size", function(d){
               return d.r/5;
           })
-          .attr("fill", "white");
+          .attr("fill", "pink");
 
       node.append("text")
           .attr("dy", "1.3em")
           .style("text-anchor", "middle")
           .text(function(d) {
-              return d.popularity;
+              return d.data.name;
           })
           .attr("font-family",  "Gill Sans", "Gill Sans MT")
           .attr("font-size", function(d){
-              return d.r/5;
+              return d.r/7;
           })
-          .attr("fill", "white");
-
-      d3.select(self.frameElement)
-          .style("height", diameter + "px");
-
-      document.getElementById("chart").appendChild(svg.node());
+          .attr("fill", "black");
+        node.transition()
+        .duration(6000);
+    //   d3.select(self.frameElement)
+    //       .style("height", diameter + "px");
+        document.getElementById("chart").replaceChild(svg.node(),oldChild);
+      }
+      
+        
       });
   
       </script>
