@@ -9,6 +9,7 @@
       Choose year:
       <output for="mySlider" id="year">2020</output>
     </p>
+    
     <input
       type="range"
       name="mySlider"
@@ -19,6 +20,21 @@
       style="margin: 0; width: 520px"
       step="1"
     />
+    <p id="textInputOther" value="">
+      Choose range:
+      <output for="myOtherSlider" id="rangeOther">10</output>
+    </p>
+    <input
+      type="range"
+      name="myOtherSlider"
+      id="myOtherSlider"
+      min="10"
+      max="100"
+      value="10"
+      style="margin: 0; width: 520px"
+      step="1"
+    />
+
 
     <table cellpadding='45'>
         <tr>
@@ -46,39 +62,39 @@
       d3.csv("data/data.csv").then((allData) => {d3.csv("data/data_yearly_artist_popularity_cleaned.csv").then((allDataArtist) => {
         // Filter top 10 songs of 2020
         var year = "2020";
+        var rangeOther = "10";
+
+        d3.select("#myOtherSlider").on("input", function(d){
+          selectedValue = this.value;
+          document.getElementById("rangeOther").value = selectedValue;  
+          rangeOther = selectedValue;
+            // For song data
+            update(dataAt());
+
+          // For artist data
+          updateArtist(dataAtArtist());
+        })
         d3.select("#mySlider").on("input", function (d) {
           selectedValue = this.value;
           document.getElementById("year").value = selectedValue;
 
           year = selectedValue.toString();
           // For song data
-          const yearData = allData.filter((d) => d.year === year);
-          var data = yearData
-            .sort(function (a, b) {
-              return d3.descending(+a.popularity, +b.popularity);
-            })
-            .slice(0, 10);
-          update(dataAt(year));
+          update(dataAt());
 
             // For artist data
-          const yearDataArtist = allDataArtist.filter((d) => d.year === year);
-          var data = yearDataArtist
-            .sort(function (a, b) {
-              return d3.descending(+a.agg_popularity, +b.agg_popularity);
-            })
-            .slice(0, 10);
-          updateArtist(dataAtArtist(year));
+          updateArtist(dataAtArtist());
         });
 
         // Filter song data
-        function dataAt(year) {
+        function dataAt() {
           const yearData = allData.filter((d) => d.year === year);
           var data = yearData
             .sort(function (a, b) {
               return d3.descending(+a.popularity, +b.popularity);
             })
-            .slice(0, 10);
-
+            .slice(0, rangeOther);
+          
           var popularities = [];
           var min = 100;
           var max = 0;
@@ -100,16 +116,16 @@
           });
           return data;
         }
-        var data = dataAt(year);
+        var data = dataAt();
 
         // Filter artist data
-        function dataAtArtist(year) {
+        function dataAtArtist() {
           const yearDataArtist = allDataArtist.filter((d) => d.year === year);
           var dataArtist = yearDataArtist
             .sort(function (a, b) {
               return d3.descending(+a.agg_popularity, +b.agg_popularity);
             })
-            .slice(0, 10);
+            .slice(0, rangeOther);
 
           var popularities = [];
           var min = 100;
@@ -132,7 +148,7 @@
           return dataArtist;
         }
 
-        var dataArtist = dataAt(year);
+        var dataArtist = dataAtArtist();
         // Setting up variables that describe chart space
         const height = 400;
         const width = 520;
