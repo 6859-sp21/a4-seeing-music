@@ -121,6 +121,7 @@
       document.getElementById("chart").appendChild(svg.node());
       
       function update(data){
+
         var oldChild = document.getElementById("chart").lastElementChild;
         
         var svg = d3.select("body")
@@ -135,6 +136,7 @@
       var node = svg.selectAll(".node")
           .data(bubble(nodes).descendants())
           .enter()
+          
           .filter(function(d){
               return  !d.children
           })
@@ -143,13 +145,15 @@
           .attr("transform", function(d) {
               return "translate(" + d.x + "," + d.y + ")";
           });
-        
+
       node.append("title")
           .text(function(d) {
               return d.data.name + ": " + d.data.popularity;
           });
 
       node.append("circle")
+        //     .transition()
+        // .duration(1000)
           .attr("r", function(d) {
               return d.r;
           })
@@ -158,6 +162,8 @@
           });
 
       node.append("text")
+    //   .transition()
+    //     .duration(1000)
           .attr("dy", ".2em")
           .style("text-anchor", "middle")
           .text(function(d) {
@@ -170,6 +176,8 @@
           .attr("fill", "pink");
 
       node.append("text")
+    //   .transition()
+    //     .duration(1000)
           .attr("dy", "1.3em")
           .style("text-anchor", "middle")
           .text(function(d) {
@@ -180,11 +188,11 @@
               return d.r/7;
           })
           .attr("fill", "black");
-        node.transition()
-        .duration(6000);
+        
     //   d3.select(self.frameElement)
     //       .style("height", diameter + "px");
         document.getElementById("chart").replaceChild(svg.node(),oldChild);
+       
       }
       
         
