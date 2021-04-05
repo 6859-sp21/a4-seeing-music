@@ -7,7 +7,7 @@
     <h1>Bubble</h1>
     <p id="textInput" value="">
       Choose year:
-      <output for="mySlider" id="year">1920</output>
+      <output for="mySlider" id="year">2020</output>
     </p>
     <input
       type="range"
@@ -15,7 +15,7 @@
       id="mySlider"
       min="1920"
       max="2020"
-      value="50"
+      value="2020"
       style="margin: 0; width: 500px"
       step="1"
     />
@@ -41,7 +41,7 @@
       // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
       d3.csv("data/data.csv").then((allData) => {
         // Filter top 10 songs of 2020
-        var year = "1920";
+        var year = "2020";
         d3.select("#mySlider").on("input", function (d) {
           selectedValue = this.value;
           document.getElementById("year").value = selectedValue;
@@ -106,9 +106,9 @@
           .attr("class", "bubble");
 
         d3.select(self.frameElement).style("height", diameter + "px");
-
+        
         document.getElementById("chart").appendChild(svg.node());
-
+        update(dataAt(year));
         function update(data) {
           var oldChild = document.getElementById("chart").lastElementChild;
 
