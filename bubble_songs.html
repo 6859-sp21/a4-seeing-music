@@ -4,7 +4,7 @@
     <script src="https://d3js.org/d3.v6.js"></script>
   </head>
   <body>
-    <h1>Bubble</h1>
+    <h1>Spotify Top Songs & Artists</h1>
     <p id="textInput" value="">
       Choose year:
       <output for="mySlider" id="year">2020</output>
@@ -19,9 +19,13 @@
       style="margin: 0; width: 500px"
       step="1"
     />
-    <div id="chart" style="width: 520px; height: 420px">
-      <!-- This is where we will put our chart. -->
-    </div>
+    <table>
+        <tr>
+            <td> <div id="chart" style="width: 520px; height: 420px"></div></td>
+            <td>  <div id="chart_artist" style="width: 520px; height: 420px"></div></td>
+        </tr>
+    </table>
+
 <style>
        div.tooltip {
         position: absolute;
@@ -37,8 +41,7 @@
       }
 </style>
     <script>
-      // Load data from a URL. You can also have the json file downloaded.
-      // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
+      // Bubble chart for songs
       d3.csv("data/data.csv").then((allData) => {
         // Filter top 10 songs of 2020
         var year = "2020";
@@ -83,7 +86,6 @@
             d.popularity_normalized =
               Math.abs(d.popularity - min) / (max - min);
           });
-          console.log(data);
           return data;
         }
         var data = dataAt(year);
@@ -91,7 +93,7 @@
         // Setting up variables that describe chart space
         const height = 400;
         const width = 500;
-        const margin = { top: 10, right: 10, bottom: 20, left: 20 };
+        const margin = { top: 10, right: 10, bottom: 30, left: 20 };
 
         var diameter = 600;
         var color = d3.scaleOrdinal(d3.schemeDark2);
@@ -147,7 +149,6 @@
               return color(i);
             })
             .on("mouseover", function(event, d) {
-            console.log(d);
              tooltip.transition()
                .duration(200)
                .style("opacity", .9);
@@ -182,7 +183,150 @@
           document.getElementById("chart").replaceChild(svg.node(), oldChild);
         }
       });
-    </script>
+
+    // Bubble chart for artists
+    d3.csv("data/data_yearly_artist_popularity_cleaned.csv").then((allData) => {
+      // Filter top 10 songs of 2020
+      var year = "2020";
+      d3.select("#mySlider").on("input", function (d) {
+        selectedValue = this.value;
+        document.getElementById("year").value = selectedValue;
+
+        year = selectedValue.toString();
+        const yearData = allData.filter((d) => d.year === year);
+        var data = yearData
+          .sort(function (a, b) {
+            return d3.descending(+a.agg_popularity, +b.agg_popularity);
+          })
+          .slice(0, 10);
+        update(dataAt(year));
+      });
+
+      function dataAt(year) {
+        const yearData = allData.filter((d) => d.year === year);
+        var data = yearData
+          .sort(function (a, b) {
+            return d3.descending(+a.agg_popularity, +b.agg_popularity);
+          })
+          .slice(0, 10);
+
+        var popularities = [];
+        var min = 100;
+        var max = 0;
+
+        for (var i = 0; i < data.length; i++) {
+          popularities.push(data[i].agg_popularity);
+        }
+
+        min = popularities.sort(function (a, b) {
+          return d3.descending(+a, +b);
+        })[9];
+        max = popularities.sort(function (a, b) {
+          return d3.descending(+a, +b);
+        })[0];
+
+        data.forEach(function (d) {
+          d.popularity_normalized =
+            Math.abs(d.agg_popularity - min) / (max - min);
+        });
+        return data;
+      }
+      var data = dataAt(year);
+
+      // Setting up variables that describe chart space
+      const height = 400;
+      const width = 500;
+      const margin = { top: 10, right: 20, bottom: 10, left: 30 };
+
+      var diameter = 600;
+      var color = d3.scaleOrdinal(d3.schemeDark2);
+
+      var bubble = d3.pack(data).size([diameter, diameter]).padding(1.5);
+
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", diameter)
+        .attr("height", diameter)
+        .attr("class", "bubble");
+
+      d3.select(self.frameElement).style("height", diameter + "px");
+      
+      document.getElementById("chart_artist").appendChild(svg.node());
+      update(dataAt(year));
+      function update(data) {
+        var oldChild = document.getElementById("chart_artist").lastElementChild;
+
+        var svg = d3
+          .select("body")
+          .append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter)
+          .attr("class", "bubble");
+
+        var nodes = d3.hierarchy({ children: data }).sum(function (d) {
+          return d.popularity_normalized;
+        });
+        var tooltip = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+        var node = svg
+          .selectAll(".node")
+          .data(bubble(nodes).descendants())
+          .enter()
+          .filter(function (d) {
+            return !d.children;
+          })
+          .append("g")
+          .attr("class", "node")
+          .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+
+        node
+          .append("circle")
+          .attr("r", function (d) {
+            return d.r;
+          })
+          .style("fill", function (d, i) {
+            return color(i);
+          })
+          .on("mouseover", function(event, d) {
+           tooltip.transition()
+             .duration(200)
+             .style("opacity", .9);
+           tooltip.html("Artist: " + d.data.artist)
+           
+             .style("left", (event.pageX) + "px")
+             .style("top", (event.pageY - 28) + "px");
+
+
+           })
+         .on("mouseout", function(event, d) {
+           tooltip.transition()
+             .duration(500)
+             .style("opacity", 0);
+
+          });
+
+        node
+          .append("text")
+          .attr("dy", "1.3em")
+          .style("text-anchor", "middle")
+
+          .text(function (d) {
+            return d.data.artist;
+          })
+          .attr("font-family", "Gill Sans", "Gill Sans MT")
+          .attr("font-size", function (d) {
+            return d.r / 8;
+          })
+          .attr("fill", "black");
+
+        document.getElementById("chart_artist").replaceChild(svg.node(), oldChild);
+      }
+    });
+  </script>
   </body>
 
   <!-- This adapted from Arvind's observable from lecture. https://observablehq.com/d/4c93c3a516d35624 -->
