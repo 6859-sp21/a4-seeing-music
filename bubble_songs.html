@@ -223,8 +223,10 @@ text{
         document.getElementById("chart_artist").appendChild(svgArtist.node());
         updateArtist(dataAtArtist(year));
 
-        function wrap(text, width) {
+        function wrap(text) {
+          
         text.each(function() {
+          
           var text = d3.select(this),
               words = text.text().split(/\s+/).reverse(),
               word,
@@ -237,7 +239,7 @@ text{
           while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
+            if (tspan.node().getComputedTextLength() > this.id*2) {
               line.pop();
               tspan.text(line.join(" "));
               line = [word];
@@ -315,11 +317,14 @@ text{
             })
             .attr("font-family", "Gill Sans", "Gill Sans MT")
             .attr("font-size", function (d) {
-              console.log(d.r)
+              // console.log(d.r)
               return d.r/8;
             })
+            .attr("id", function (d) {
+              return d.r;
+            })
             .attr("fill", "black")
-            .call(wrap, 200);
+            .call(wrap);
             
           document.getElementById("chart").replaceChild(svg.node(), oldChild);
         }
@@ -393,8 +398,11 @@ text{
           .attr("font-size", function (d) {
             return d.r / 8;
           })
+          .attr("id", function (d) {
+              return d.r;
+            })
           .attr("fill", "black")
-          .call(wrap, 200);
+          .call(wrap);
 
           svg.on('click', (event, d)=>{
             document.cookie = event.srcElement.__data__.data.artist;
