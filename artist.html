@@ -157,7 +157,7 @@
           .attr("y1", function(d) { return y(d.name); })
           .attr("y2", function(d) { return y(d.name); })
           .attr("stroke", "grey")
-
+    svg.call(brush)
       // Circles
       const circle = svg.append("g")
          .attr("fill", "#69b3a2")
@@ -186,7 +186,7 @@
       
 
       update()
-      svg.call(brush);
+      
 
       function brushed(event) {
         const coords = event.selection;
@@ -290,6 +290,7 @@
             .attr("width", x.bandwidth()/2)
             .attr("height", function(d) {return y(0) - y(d.value)})
             .attr("fill", "#69b3a2")
+           
 
         if(oldChild === null){
           document.getElementById(chartName).appendChild(svg2.node());
