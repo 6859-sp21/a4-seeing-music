@@ -66,18 +66,9 @@
       d3.csv("data/data_bubble_to_artist.csv").then((allData) => {
       var artist = "";
       artist += document.cookie;
-      // artist +="'";
-      // Get Artist Data
-      //const artist = "['Justin Bieber']";
-      // Set artist name TODO: text will be the artist variable from the bubble chart on home page
+      // Set artist name
       document.getElementById("artistName").innerHTML = document.cookie;
-      const artistData = allData.filter(d => {
-        // console.log(d.artists);
-        // let artists = d.artists.replace(/[\'[\']/g, '["');
-        // artists = d.artists.replace("']", '"]');
-        // artists = d.artists.replace("',", '",');
-        // console.log(artists)
-        // let artistArray = JSON.parse(artists); 
+      const artistData = allData.filter(d => { 
         if (d.artists === artist){
           return d
           
