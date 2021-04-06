@@ -223,6 +223,7 @@ text{
         document.getElementById("chart_artist").appendChild(svgArtist.node());
         updateArtist(dataAtArtist(year));
 
+
         function update(data) {
           var oldChild = document.getElementById("chart").lastElementChild;
 
@@ -277,19 +278,19 @@ text{
                .style("opacity", 0);
 
             });
-
-          node
+ 
+            node
             .append("text")
             .attr("dy", "1.3em")
             
             .style("text-anchor", "middle")
-
+            
             .text(function (d) {
               return d.data.name;
             })
             .attr("font-family", "Gill Sans", "Gill Sans MT")
             .attr("font-size", function (d) {
-              return d.r / 8;
+              return d.r/8;
             })
             .attr("fill", "black");
 
@@ -365,6 +366,7 @@ text{
             return d.r / 8;
           })
           .attr("fill", "black");
+
           svg.on('click', (event, d)=>{
             document.cookie = event.srcElement.__data__.data.artist;
             window.location.href = './artist.html';
