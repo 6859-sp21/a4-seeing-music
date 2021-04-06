@@ -8,8 +8,9 @@
     <button id="back" type ="button">Back to top songs and artists</button>
     <h1 id = "artistName" style="font-family: 'Helvetica Neue', sans-serif; margin-left: 10;"></h1>
     <div style="display: flex;">
-      <div style="flex: 1; margin-left: 10;">
-        <p style = "font-family: 'Helvetica Neue', sans-serif; font-size: 25; font-weight: lighter; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
+      <div style="flex: 1; margin-left: 10; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
+        <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
+        <p style = "font-size: 14;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
         <div id="chart"></div>
       </div>
       <div style="flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
@@ -95,7 +96,7 @@
       // selected data from brush
       let selectedData = artistData;
 
-      var margin = {top: 10, right: 30, bottom: 40, left: 150},
+      var margin = {top: 20, right: 30, bottom: 40, left: 150},
         width = 600 - margin.left - margin.right,
         height = 600* (artistData.length/50) - margin.top - margin.bottom;
 
@@ -120,13 +121,13 @@
       var x = d3.scaleTime()
           .domain(d3.extent(artistData, function(d){
             return new Date(d.release_date)
-          }))
+          })).nice()
           .range([ 0, width]);
       svg.append("g")
           .attr("transform", `translate(0, ${margin.top})`)
           .call(d3.axisTop(x))
           .selectAll("text")
-          .attr("transform", "translate(0,-10)rotate(-45)")
+          .attr("transform", "translate(25, -20)rotate(-45)")
           .style("text-anchor", "end");
 
 
@@ -397,7 +398,7 @@
           tooltip.transition()
             .duration(200)
             .style("opacity", .9)
-          tooltip.html("Song: " + d.name )
+          tooltip.html("Song: " + d.name + `<br/> ${chartName}: ` + getDataType(d))
              .style("left", (event.pageX) + "px")
              .style("top", (event.pageY - 28) + "px");
         })
