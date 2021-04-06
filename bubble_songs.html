@@ -193,7 +193,8 @@ text{
         const margin = { top: 10, right: 30, bottom: 30, left: 30 };
 
         var diameter = 600;
-        var color = d3.scaleOrdinal(d3.schemeDark2);
+        schema = ["#2d856b", "#1eba54", "#69b3a2", "#12eeaa", "#20d760"];
+        var color = d3.scaleOrdinal(schema);
 
         var bubble = d3.pack(data).size([diameter, diameter]).padding(3);
         var bubbleArtist = d3.pack(dataArtist).size([diameter, diameter]).padding(3);
