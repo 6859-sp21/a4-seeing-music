@@ -63,12 +63,14 @@
 
       // Load data from a URL. You can also have the json file downloaded.
       // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
-      d3.csv("data/data.csv").then((allData) => {
-      const a = document.cookie;
+      d3.csv("data/data_bubble_to_artist.csv").then((allData) => {
+      var artist = "'";
+      artist += document.cookie;
+      artist +="'";
       // Get Artist Data
-      const artist = "['Justin Bieber']";
+      //const artist = "['Justin Bieber']";
       // Set artist name TODO: text will be the artist variable from the bubble chart on home page
-      document.getElementById("artistName").innerHTML = "Justin Bieber";
+      document.getElementById("artistName").innerHTML = document.cookie;
       const artistData = allData.filter(d => {
         // console.log(d.artists);
         // let artists = d.artists.replace(/[\'[\']/g, '["');
@@ -76,8 +78,10 @@
         // artists = d.artists.replace("',", '",');
         // console.log(artists)
         // let artistArray = JSON.parse(artists); 
+        
         if (d.artists === artist){
           return d
+          
         }
       });
 
