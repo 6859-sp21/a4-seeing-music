@@ -157,7 +157,7 @@
           .attr("y1", function(d) { return y(d.name); })
           .attr("y2", function(d) { return y(d.name); })
           .attr("stroke", "grey")
-    svg.call(brush)
+      svg.call(brush)
       // Circles
       const circle = svg.append("g")
          .attr("fill", "#69b3a2")
@@ -362,6 +362,20 @@
             .attr("width", x.bandwidth())
             .attr("height", function(d) {return y(0) - y(getDataType(d))})
             .attr("fill", "#69b3a2")
+            .on("mouseover", function(event, d){
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9)
+          tooltip.html("Song: " + d.name )
+             .style("left", (event.pageX) + "px")
+             .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(event, d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+
+        });
 
         if(oldChild2 === null){
           document.getElementById(`all${chartName}`).appendChild(svg.node());
