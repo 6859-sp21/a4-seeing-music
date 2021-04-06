@@ -366,7 +366,7 @@
           tooltip.transition()
             .duration(200)
             .style("opacity", .9)
-          tooltip.html("Song: " + d.name )
+          tooltip.html("Song: " + d.name + `<br/> ${chartName}: ` + getDataType(d))
              .style("left", (event.pageX) + "px")
              .style("top", (event.pageY - 28) + "px");
         })
