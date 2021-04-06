@@ -5,6 +5,7 @@
     <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
   </head>
   <body>
+    <button id="back" type ="button">Back to top songs and artists</button>
     <h1 id = "artistName" style="font-family: 'Helvetica Neue', sans-serif; margin-left: 10;"></h1>
     <div style="display: flex;">
       <div style="flex: 1; margin-left: 10;">
@@ -54,6 +55,8 @@
       }
     </style>
     <script>
+      document.getElementById("back").onclick = function() {window.location.href = './bubble_songs.html';};
+
       var margin = {top: 0, right: 30, bottom: 40, left: 150},
         width = 600 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
@@ -61,7 +64,7 @@
       // Load data from a URL. You can also have the json file downloaded.
       // See https://github.com/d3/d3/blob/master/API.md#fetches-d3-fetch for more options.
       d3.csv("data/data.csv").then((allData) => {
-
+      const a = document.cookie;
       // Get Artist Data
       const artist = "['Justin Bieber']";
       // Set artist name TODO: text will be the artist variable from the bubble chart on home page

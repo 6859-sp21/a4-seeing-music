@@ -49,6 +49,7 @@
            <div id="chart" style="width: 520px; height: 420px;"></div></td>
           
            <td><h1 style="color:whitesmoke; font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: 0.8cm; text-align: center;" >Artists</h1>
+              <p style="color:whitesmoke; font-family:'Helvetica Neue', sans-serif; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
               <div id="chart_artist" style="width: 520px; height: 420px;"></div></td>
         </tr>
     </table>
@@ -356,7 +357,10 @@
             return d.r / 8;
           })
           .attr("fill", "black");
-
+          svg.on('click', (event, d)=>{
+            document.cookie = event.srcElement.__data__.data.artist;
+            window.location.href = './artist.html';
+          })
         document.getElementById("chart_artist").replaceChild(svg.node(), oldChild);
       }
       });
