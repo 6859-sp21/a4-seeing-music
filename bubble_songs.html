@@ -20,7 +20,7 @@
         min="10"
         max="100"
         value="10"
-        style="margin: 0; width: 1000px;"
+        style="width: 1000px;"
         step="1"
         class="slider"
       />
@@ -37,7 +37,7 @@
       min="1920"
       max="2020"
       value="2020"
-      style="margin: 0; width: 1000px;  "
+      style="width: 1000px;  "
       step="1"
       class="slider"
     />
@@ -72,16 +72,18 @@
   -webkit-appearance: none;  /* Override default CSS styles */
   appearance: none;
   width: 100%; /* Full-width */
-  height: 5px; /* Specified height */
+  height: 2px; /* Specified height */
+  margin-top:10px;
   
 }
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 30px;
-  height: 40px;
+  height: 30px;
+  margin-bottom: 20px;
   border: 0;
-  background: url('music5.png');
+  background: url('music-slider.png');
   cursor: pointer;
 
   
