@@ -41,6 +41,18 @@
       </div>
     </div>
 
+    <style>
+      .selected {
+        opacity: 1 !important;
+        stroke: black;
+        fill: #69b3a2;
+      }
+      .not-selected {
+        opacity: 0.5 !important;
+        stroke: gray;
+        fill: white;
+      }
+    </style>
     <script>
       var margin = {top: 0, right: 30, bottom: 40, left: 150},
         width = 600 - margin.left - margin.right,
@@ -69,9 +81,16 @@
       // sort from earliest date to the latest date
       artistData.sort((a, b) => ((new Date(a.release_date)).getTime() > (new Date(b.release_date)).getTime())? 1: -1)
       
+      // selected data from brush
+      let selectedData = artistData;
+
       var svg = d3.create("svg")
           .attr("viewBox", [-margin.left, 0, width + margin.left + margin.right, height + margin.top + margin.bottom])
-          
+
+      const brush = d3.brush()
+          .extent([[-20, 0], [width, height-margin.bottom]])
+          .on("start brush end", brushed);
+
       svg.append("g")
         .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
@@ -120,7 +139,9 @@
           .attr("stroke", "grey")
 
       // Circles
-      svg.append("g")
+      const circle = svg.append("g")
+         .attr("fill", "#69b3a2")
+         .attr("stroke", "black")
          .selectAll("mycircle")
           .data(artistData)
           .enter()
@@ -128,32 +149,72 @@
           .attr("cx", function(d) { return x(new Date(d.release_date)); })
           .attr("cy", function(d) { return y(d.name); })
           .attr("r", "7")
-          .style("fill", "#69b3a2")
-          .attr("stroke", "black")
+      
+      update()
+      svg.call(brush);
+
+      function brushed(event) {
+        const coords = event.selection;
+        if(coords){
+          const [[x0, y0], [x1, y1]] = coords;
+          if(coords[0][0] !== coords[1][0] && coords[0][1] !== coords[1][1]){
+            selectedData = []
+            circle.classed("selected", function(d){ 
+              let brushed = isBrushed(coords, x(new Date(d.release_date)), y(d.name));
+              if(brushed){
+                selectedData.push(d)
+              }
+              return brushed
+            })
+            circle.classed("not-selected", function(d){ return !isBrushed(coords, x(new Date(d.release_date)), y(d.name)) })
+          }else{
+            selectedData = artistData
+            circle.classed("selected", function(d){ return true })
+            circle.classed("not-selected", function(d){ return false })
+          }     
+
+          function isBrushed(coords, x, y){
+            return coords[0][0] <= x && x <= coords[1][0] && coords[0][1] <= y && y <= coords[1][1]
+          }
+          update()
+        } 
+      }
 
       document.getElementById("chart").appendChild(svg.node());
-      // column titles for song information
-      let songInfo = [{title: "Acousticness", value: 0}, {title: "Danceability", value: 0}, {title: "Key", value: 0}, {title:"Loudness", value: 0}, {title:"Tempo", value: 0}]
-      
-      //get values for song information
-      artistData.forEach( d => {
-        songInfo[0].value += parseFloat(d.acousticness);
-        songInfo[1].value += parseFloat(d.danceability);
-        songInfo[2].value += parseInt(d.key);
-        songInfo[3].value += parseFloat(d.loudness);
-        songInfo[4].value += parseFloat(d.tempo);
-      })
 
-      let length = artistData.length;
-      songInfo.map(d => {
-        d.value = d.value/length
-      })
+      function update(){
+        // column titles for song information
+        let songInfo = [{title: "Acousticness", value: 0}, {title: "Danceability", value: 0}, {title: "Key", value: 0}, {title:"Loudness", value: 0}, {title:"Tempo", value: 0}]
 
-      songInfo.forEach(s =>{
-        makeGraphs([s], s.title, artistData)
-      })
+        if(selectedData.length >= 1) {
+          //get values for song information
+          selectedData.forEach( d => {
+            songInfo[0].value += parseFloat(d.acousticness);
+            songInfo[1].value += parseFloat(d.danceability);
+            songInfo[2].value += parseInt(d.key);
+            songInfo[3].value += parseFloat(d.loudness);
+            songInfo[4].value += parseFloat(d.tempo);
+          })
+
+          let length = selectedData.length;
+          songInfo.map(d => {
+            d.value = d.value/length
+          })
+
+          songInfo.forEach(s =>{
+              makeGraphs([s], s.title, selectedData)
+          })
+        }
+      }
 
       function makeGraphs(data, chartName, dataSelected){
+        let oldChild = null
+        let oldChild2 = null
+        if(document.getElementById(chartName) !== null){
+          oldChild = document.getElementById(chartName).lastElementChild;
+          oldChild2 = document.getElementById(`all${chartName}`).lastElementChild;
+        }
+
         // AVERAGE CHARTS append the svg object to the body of the page
         var margin2 = {top: 10, right: 0, bottom: 30, left: 0},
           width2 = 100,
@@ -195,7 +256,11 @@
             .attr("height", function(d) {return y(0) - y(d.value)})
             .attr("fill", "#69b3a2")
 
-        document.getElementById(chartName).appendChild(svg2.node());
+        if(oldChild === null){
+          document.getElementById(chartName).appendChild(svg2.node());
+        }else{
+          document.getElementById(chartName).replaceChild(svg2.node(), oldChild);
+        }
 
         // OVERALL CHART append the svg object to the body of the page
         function getDataType(d){
@@ -245,7 +310,11 @@
             .attr("height", function(d) {return y(0) - y(getDataType(d))})
             .attr("fill", "#69b3a2")
 
-        document.getElementById(`all${chartName}`).appendChild(svg.node());
+        if(oldChild2 === null){
+          document.getElementById(`all${chartName}`).appendChild(svg.node());
+        }else{
+          document.getElementById(`all${chartName}`).replaceChild(svg.node(), oldChild2);
+        }
       }
 
       });
