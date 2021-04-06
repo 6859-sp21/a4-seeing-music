@@ -105,6 +105,32 @@
           .attr("transform", "translate(0,-10)rotate(-45)")
           .style("text-anchor", "end");
 
+
+        function truncateLabel(text, width) {
+          console.log(text)
+          text.each(function() {
+            var text = d3.select(this),
+                  words = text.text().split(/\s+/).reverse(),
+                  word,
+                  line = [],
+                  lineNumber = 0,
+                  lineHeight = 1.1, // ems
+                  y = text.attr("y"),
+                  dy = parseFloat(text.attr("dy")),
+                  tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+              while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.text().length * 6 > width) {
+                  line.pop();
+                  tspan.text(line.join(" ") + "...");
+                  
+                  break;
+                }
+              }
+            });
+          }
+        
       // Y axis
       var y = d3.scaleBand()
           .domain(artistData.map(function(d) { return d.name; }))
@@ -114,6 +140,9 @@
           .call(d3.axisLeft(y))
           // .selectAll(".tick text") tried adding wrap
           //   .call(wrap, margin.left)
+          .selectAll(".tick text") 
+          .call(truncateLabel, margin.left)
+          
             
       // min line var
       var min = new Date(artistData[0].release_date).getTime();
