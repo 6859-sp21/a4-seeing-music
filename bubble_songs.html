@@ -223,6 +223,30 @@ text{
         document.getElementById("chart_artist").appendChild(svgArtist.node());
         updateArtist(dataAtArtist(year));
 
+        function wrap(text, width) {
+        text.each(function() {
+          var text = d3.select(this),
+              words = text.text().split(/\s+/).reverse(),
+              word,
+              line = [],
+              lineNumber = 0,
+              lineHeight = 0, // ems
+              y = text.attr("y"),
+              dy = parseFloat(text.attr("dy")),
+              tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+          while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+              line.pop();
+              tspan.text(line.join(" "));
+              line = [word];
+              tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+          }
+
+        });
+      }
 
         function update(data) {
           var oldChild = document.getElementById("chart").lastElementChild;
@@ -278,24 +302,29 @@ text{
                .style("opacity", 0);
 
             });
- 
+            
             node
             .append("text")
-            .attr("dy", "1.3em")
+            .attr("dy", "1em")
             
             .style("text-anchor", "middle")
             
             .text(function (d) {
+              
               return d.data.name;
             })
             .attr("font-family", "Gill Sans", "Gill Sans MT")
             .attr("font-size", function (d) {
+              console.log(d.r)
               return d.r/8;
             })
-            .attr("fill", "black");
-
+            .attr("fill", "black")
+            .call(wrap, 200);
+            
           document.getElementById("chart").replaceChild(svg.node(), oldChild);
         }
+
+        
 
         // Update artist chart
         function updateArtist(data) {
@@ -355,9 +384,8 @@ text{
 
         node
           .append("text")
-          .attr("dy", "1.3em")
+          .attr("dy", "1em")
           .style("text-anchor", "middle")
-
           .text(function (d) {
             return d.data.artist;
           })
@@ -365,7 +393,8 @@ text{
           .attr("font-size", function (d) {
             return d.r / 8;
           })
-          .attr("fill", "black");
+          .attr("fill", "black")
+          .call(wrap, 200);
 
           svg.on('click', (event, d)=>{
             document.cookie = event.srcElement.__data__.data.artist;
