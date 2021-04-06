@@ -291,10 +291,15 @@ text{
               return color(i);
             })
             .on("mouseover", function(event, d) {
+             var a = d.data.artists;
+             var parsed_a = a.slice(2,a.length-2);
+             parsed_a = parsed_a.replace(/'/g, "");
+
+             
              tooltip.transition()
                .duration(200)
                .style("opacity", .9);
-             tooltip.html("Song: " + d.data.name + "<br/> Artists: " + d.data.artists)
+             tooltip.html("Song: " + d.data.name + "<br/> Artists: " + parsed_a)
              
                .style("left", (event.pageX) + "px")
                .style("top", (event.pageY - 28) + "px");
