@@ -1,4 +1,12 @@
-# a4-seeing-music
-a4-seeing-music created by GitHub Classroom
+# 6.859 A4: Seeing Music
+
+Team Members:
+- Rachael Fuchs (rfuchs)
+- Alizée Schoen (amschoen)
+- Claire Yin (yinc)
+
+## Design Decisions
+
+## Overview of Development Process
 
 
