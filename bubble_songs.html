@@ -5,9 +5,9 @@
   </head>
   <body style="background-color:rgba(0, 0, 0, 0.9); background-image: url('spotify.png'); background-position: center; background-size:60%; background-blend-mode:  soft-light ; " >
 
-    <h1 style="color:whitesmoke; font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: 2.2cm; text-align: center;" >Spotify Top Songs & Artists</h1>
+    <h1 style="color:whitesmoke; font-size: 2.2cm; text-align: center;" >Spotify Top Songs & Artists</h1>
 
-    <p id="textInputOther" value="" style="color:whitesmoke; font-family: 'Courier New', Courier, monospace; font-size: larger;">
+    <p id="textInputOther" value="" style="color:whitesmoke; font-size: larger;">
         Top
         <output for="myOtherSlider" id="rangeOther" style="font-weight: bolder; font-size: larger;">10</output>
         Artists and Songs
@@ -25,9 +25,9 @@
         class="slider"
       />
     </div>
-    <p id="textInput" value="" style="color:whitesmoke; font-family:'Courier New', Courier, monospace; font-size: larger;">
+    <p id="textInput" value="" style="color:whitesmoke; font-size: larger;">
       Of
-      <output for="mySlider" id="year" style="color:whitesmoke; font-family:'Courier New', Courier, monospace; font-size: larger; font-weight: bolder;">2020</output>
+      <output for="mySlider" id="year" style="color:whitesmoke;  font-size: larger; font-weight: bolder;">2020</output>
     </p>
     
     <input
@@ -45,11 +45,11 @@
 
     <table cellpadding='50'>
         <tr>
-          <td> <h1 style="color:whitesmoke; font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: 0.8cm; text-align: center;" >Top Songs</h1>
+          <td> <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
            <div id="chart" style="width: 520px; height: 420px;"></div></td>
           
-           <td><h1 style="color:whitesmoke; font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: 0.8cm; text-align: center;" >Artists</h1>
-              <p style="color:whitesmoke; font-family:'Helvetica Neue', sans-serif; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
+           <td><h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
+              <p style="color:whitesmoke; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
               <div id="chart_artist" style="width: 520px; height: 420px;"></div></td>
         </tr>
     </table>
@@ -83,8 +83,16 @@
   border: 0;
   background: url('music.png');
   cursor: pointer;
-}
 
+  
+}
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+}
+text{
+  font-family: 'Helvetica Neue', sans-serif;
+  overflow-wrap: normal; 
+}
 </style>
     <script>
       // Bubble chart for songs
@@ -122,8 +130,7 @@
             .sort(function (a, b) {
               return d3.descending(+a.popularity, +b.popularity);
             })
-            .slice(0, rangeOther);
-          
+            .slice(0, parseInt(rangeOther));
           var popularities = [];
           var min = 100;
           var max = 0;
@@ -141,7 +148,7 @@
 
           data.forEach(function (d) {
             d.popularity_normalized =
-              Math.abs(d.popularity - min) / (max - min);
+              (Math.abs(d.popularity - min) / (max - min))+0.1;
           });
           return data;
         }
@@ -154,7 +161,7 @@
             .sort(function (a, b) {
               return d3.descending(+a.agg_popularity, +b.agg_popularity);
             })
-            .slice(0, rangeOther);
+            .slice(0, parseInt(rangeOther));
 
           var popularities = [];
           var min = 100;
@@ -171,7 +178,7 @@
           })[0];
           dataArtist.forEach(function (d) {
             d.popularity_normalized =
-              Math.abs(d.agg_popularity - min) / (max - min);
+              (Math.abs(d.agg_popularity - min) / (max - min))+0.1;
           });
           
           return dataArtist;
@@ -274,6 +281,7 @@
           node
             .append("text")
             .attr("dy", "1.3em")
+            
             .style("text-anchor", "middle")
 
             .text(function (d) {
