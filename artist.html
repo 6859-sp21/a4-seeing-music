@@ -15,26 +15,31 @@
       <div style="flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
         <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Information</p>
         <p style = "font-size: 20;" > Acousticness </p>
-        <div style="display: flex; ">
+        <p style = "font-size: 14; margin-top: -10;" > The relative metric of the track being acoustic. </p>
+        <div style="display: flex; margin-top: 20;">
           <div id="Acousticness" style="flex: 1;"></div>
           <div id="allAcousticness" style="flex: 2;"></div>
         </div>
         <p style = "font-size: 20;" > Danceability </p>
+        <p style = "font-size: 14; margin-top: -10;" > The relative measurement of the track being danceable. </p>
         <div style="display: flex;">
           <div id="Danceability" style="flex: 1;"></div>
           <div id="allDanceability" style="flex: 2;"></div>
         </div>
         <p style = "font-size: 20;" > Key </p>
+        <p style = "font-size: 14; margin-top: -10;" > The primary key of the track encoded as integers in between 0 and 11. </p>
         <div style="display: flex;">
           <div id="Key" style="flex: 1;"></div>
           <div id="allKey" style="flex: 2;"></div>
         </div>
         <p style = "font-size: 20;" > Loudness </p>
+        <p style = "font-size: 14; margin-top: -10;" > Relative loudness of the track in the typical range [-60, 0] in decibel (dB). </p>
         <div style="display: flex;">
           <div id="Loudness" style="flex: 1;"></div>
           <div id="allLoudness" style="flex: 2;"></div>
         </div>
         <p style = "font-size: 20;" > Tempo </p>
+        <p style = "font-size: 14; margin-top: -10;" > The tempo of the track in Beat Per Minute (BPM). </p>
         <div style="display: flex;">
           <div id="Tempo" style="flex: 1;"></div>
           <div id="allTempo" style="flex: 2;"></div>
@@ -43,6 +48,19 @@
     </div>
 
     <style>
+      div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: auto;
+        height: auto;
+        padding: 4px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
       .selected {
         opacity: 1 !important;
         stroke: black;
@@ -83,6 +101,10 @@
 
       var svg = d3.create("svg")
           .attr("viewBox", [-margin.left, -margin.top, width + margin.left + margin.right, height + margin.top + margin.bottom])
+
+      var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
       const brush = d3.brush()
           .extent([[-20, 0], [width, height-margin.bottom]])
@@ -164,7 +186,7 @@
           .attr("y1", function(d) { return y(d.name); })
           .attr("y2", function(d) { return y(d.name); })
           .attr("stroke", "grey")
-
+      svg.call(brush)
       // Circles
       const circle = svg.append("g")
          .attr("fill", "#69b3a2")
@@ -176,9 +198,24 @@
           .attr("cx", function(d) { return x(new Date(d.release_date)); })
           .attr("cy", function(d) { return y(d.name); })
           .attr("r", "7")
+        .on("mouseover", function(event, d){
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9)
+          tooltip.html("Song: " + d.name + "<br/> Release Date: " + d.release_date)
+             .style("left", (event.pageX) + "px")
+             .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(event, d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+
+        });
       
+
       update()
-      svg.call(brush);
+      
 
       function brushed(event) {
         const coords = event.selection;
@@ -244,9 +281,9 @@
 
         // AVERAGE CHARTS append the svg object to the body of the page
         var margin2 = {top: 10, right: 0, bottom: 30, left: 0},
-          width2 = 100,
-          height2 = 150,
-          width = 300,
+          width2 = 80,
+          height2 = 130,
+          width = 320,
           height = 250;
 
         var svg2 = d3.create("svg")
@@ -260,7 +297,7 @@
           .attr("transform", `translate(0, ${height2-margin2.bottom})`)
           .call(d3.axisBottom(x))
           .selectAll("text")
-            .style("font-size", "8px")
+            .style("font-size", "6px")
             .style("text-anchor", "end");
 
         // Add Y axis
@@ -269,7 +306,7 @@
           .range([ height2-margin2.bottom, margin2.top]);
         svg2.append("g")
           .call(d3.axisLeft(y))
-          .style("font-size", "7px");
+          .style("font-size", "6px");
 
         // Bars
         svg2.append("g")
@@ -282,6 +319,7 @@
             .attr("width", x.bandwidth()/2)
             .attr("height", function(d) {return y(0) - y(d.value)})
             .attr("fill", "#69b3a2")
+           
 
         if(oldChild === null){
           document.getElementById(chartName).appendChild(svg2.node());
@@ -327,16 +365,20 @@
           .attr("transform", `translate(0, ${height-margin2.bottom})`)
           .call(d3.axisBottom(x))
           .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
+            .attr("transform", "translate(-10,0)rotate(-90)")
             .style("font-size", `${fontSize}px`)
             .style("text-anchor", "end");
+
+        let fontY = d3.max(dataSelected, d=> getDataType(d)).toString().length 
+        fontY = 10-(fontY/2)
 
         // Add Y axis
         var y = d3.scaleLinear()
           .domain([0, d3.max(dataSelected, d=> getDataType(d))]).nice()
           .range([ height-margin2.bottom, margin2.top]);
         svg.append("g")
-          .call(d3.axisLeft(y));
+          .call(d3.axisLeft(y))
+          .style("font-size", `${fontY}px`);
 
         // Bars
         svg.append("g")
@@ -349,6 +391,20 @@
             .attr("width", x.bandwidth())
             .attr("height", function(d) {return y(0) - y(getDataType(d))})
             .attr("fill", "#69b3a2")
+            .on("mouseover", function(event, d){
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9)
+          tooltip.html("Song: " + d.name )
+             .style("left", (event.pageX) + "px")
+             .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(event, d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+
+        });
 
         if(oldChild2 === null){
           document.getElementById(`all${chartName}`).appendChild(svg.node());
