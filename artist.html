@@ -121,7 +121,7 @@
       var x = d3.scaleTime()
           .domain(d3.extent(artistData, function(d){
             return new Date(d.release_date)
-          })).nice()
+          }))
           .range([ 0, width]);
       svg.append("g")
           .attr("transform", `translate(0, ${margin.top})`)
@@ -146,12 +146,14 @@
                 line.push(word);
                 tspan.text(line.join(" "));
                 if (tspan.text().length * 6 > width) {
-                  line.pop();
-                  tspan.text(line.join(" ") + "...");
-                  
+                  line.pop();       
+                  line.push("... ")           
                   break;
                 }
               }
+              line.push("---");
+
+              tspan.text(line.join(" "));
             });
           }
         
