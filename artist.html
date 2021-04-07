@@ -10,7 +10,7 @@
     <div style="display: flex;">
       <div style="flex: 1; margin-left: 10; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
         <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
-        <p style = "font-size: 14;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
+        <p style = "font-size: 14; margin-top: -10;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
         <div id="chart"></div>
       </div>
       <div style="flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
@@ -321,7 +321,7 @@
             .attr("y", function(d) { return y(d.value); })
             .attr("width", x.bandwidth()/2)
             .attr("height", function(d) {return y(0) - y(d.value)})
-            .attr("fill", "#69b3a2")
+            .attr("fill", "#2d856b")
            
 
         if(oldChild === null){
