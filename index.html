@@ -1,113 +1,429 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-		<title>D3: A simple packed Bubble Chart</title>
-		<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+<html>
+  <head>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v6.js"></script>
+  </head>
+  <body style="background-color:rgba(0, 0, 0, 0.9); background-image: url('spotify.png'); background-position: center; background-size:60%; background-blend-mode:  soft-light ; " >
 
-		<style type="text/css">
-			/* No style rules here yet */		
-		</style>
-</head>
-<body>
-	<script type="text/javascript">
+    <h1 style="color:whitesmoke; font-size: 2.2cm; text-align: center;" >Spotify Top Songs & Artists</h1>
 
-        dataset = {
-            "children": [{"Name":"Olives","Count":4319},
-                {"Name":"Tea","Count":4159},
-                {"Name":"Mashed Potatoes","Count":2583},
-                {"Name":"Boiled Potatoes","Count":2074},
-                {"Name":"Milk","Count":1894},
-                {"Name":"Chicken Salad","Count":1809},
-                {"Name":"Vanilla Ice Cream","Count":1713},
-                {"Name":"Cocoa","Count":1636},
-                {"Name":"Lettuce Salad","Count":1566},
-                {"Name":"Lobster Salad","Count":1511},
-                {"Name":"Chocolate","Count":1489},
-                {"Name":"Apple Pie","Count":1487},
-                {"Name":"Orange Juice","Count":1423},
-                {"Name":"American Cheese","Count":1372},
-                {"Name":"Green Peas","Count":1341},
-                {"Name":"Assorted Cakes","Count":1331},
-                {"Name":"French Fried Potatoes","Count":1328},
-                {"Name":"Potato Salad","Count":1306},
-                {"Name":"Baked Potatoes","Count":1293},
-                {"Name":"Roquefort","Count":1273},
-                {"Name":"Stewed Prunes","Count":1268}]
-        };
+    <p id="textInputOther" value="" style="color:whitesmoke; font-size: larger;">
+        Top
+        <output for="myOtherSlider" id="rangeOther" style="font-weight: bolder; font-size: larger;">10</output>
+        Artists and Songs
+      </p>
+      <div class="slide-bar"></div>
+      <input
+        type="range"
+        name="myOtherSlider"
+        id="myOtherSlider"
+        min="10"
+        max="100"
+        value="10"
+        style="width: 1000px;"
+        step="1"
+        class="slider"
+      />
+    </div>
+    <p id="textInput" value="" style="color:whitesmoke; font-size: larger;">
+      Of
+      <output for="mySlider" id="year" style="color:whitesmoke;  font-size: larger; font-weight: bolder;">2020</output>
+    </p>
+    
+    <input
+      type="range"
+      name="mySlider"
+      id="mySlider"
+      min="1920"
+      max="2020"
+      value="2020"
+      style="width: 1000px;  "
+      step="1"
+      class="slider"
+    />
+
+
+    <table cellpadding='50'>
+        <tr>
+          <td> <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
+           <div id="chart" style="width: 520px; height: 420px;"></div></td>
+          
+           <td><h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
+              <p style="color:whitesmoke; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
+              <div id="chart_artist" style="width: 520px; height: 420px;"></div></td>
+        </tr>
+    </table>
+
+<style>
+       div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: auto;
+        height: auto;
+        padding: 4px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 2px; /* Specified height */
+  margin-top:10px;
+  
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+  border: 0;
+  background: url('music-slider.png');
+  cursor: pointer;
+
+  
+}
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+}
+text{
+  font-family: 'Helvetica Neue', sans-serif;
+  overflow-wrap: normal; 
+}
+</style>
+    <script>
+      // Bubble chart for songs
+      d3.csv("data/data.csv").then((allData) => {d3.csv("data/data_yearly_artist_popularity_cleaned.csv").then((allDataArtist) => {
+        // Filter top 10 songs of 2020
+        var year = "2020";
+        var rangeOther = "10";
+
+        d3.select("#myOtherSlider").on("input", function(d){
+          selectedValue = this.value;
+          document.getElementById("rangeOther").value = selectedValue;  
+          rangeOther = selectedValue;
+            // For song data
+            update(dataAt());
+
+          // For artist data
+          updateArtist(dataAtArtist());
+        })
+        d3.select("#mySlider").on("input", function (d) {
+          selectedValue = this.value;
+          document.getElementById("year").value = selectedValue;
+
+          year = selectedValue.toString();
+          // For song data
+          update(dataAt());
+
+            // For artist data
+          updateArtist(dataAtArtist());
+        });
+
+        // Filter song data
+        function dataAt() {
+          const yearData = allData.filter((d) => d.year === year);
+          var data = yearData
+            .sort(function (a, b) {
+              return d3.descending(+a.popularity, +b.popularity);
+            })
+            .slice(0, parseInt(rangeOther));
+          var popularities = [];
+          var min = 100;
+          var max = 0;
+
+          for (var i = 0; i < data.length; i++) {
+            popularities.push(data[i].popularity);
+          }
+
+          min = popularities.sort(function (a, b) {
+            return d3.descending(+a, +b);
+          })[9];
+          max = popularities.sort(function (a, b) {
+            return d3.descending(+a, +b);
+          })[0];
+
+          data.forEach(function (d) {
+            d.popularity_normalized =
+              (Math.abs(d.popularity - min) / (max - min))+0.1;
+          });
+          return data;
+        }
+        var data = dataAt();
+
+        // Filter artist data
+        function dataAtArtist() {
+          const yearDataArtist = allDataArtist.filter((d) => d.year === year);
+          var dataArtist = yearDataArtist
+            .sort(function (a, b) {
+              return d3.descending(+a.agg_popularity, +b.agg_popularity);
+            })
+            .slice(0, parseInt(rangeOther));
+
+          var popularities = [];
+          var min = 100;
+          var max = 0;
+
+          for (var i = 0; i < dataArtist.length; i++) {
+            popularities.push(dataArtist[i].agg_popularity);
+          }
+          min = popularities.sort(function (a, b) {
+            return d3.descending(+a, +b);
+          })[9];
+          max = popularities.sort(function (a, b) {
+            return d3.descending(+a, +b);
+          })[0];
+          dataArtist.forEach(function (d) {
+            d.popularity_normalized =
+              (Math.abs(d.agg_popularity - min) / (max - min))+0.1;
+          });
+          
+          return dataArtist;
+        }
+
+        var dataArtist = dataAtArtist();
+        // Setting up variables that describe chart space
+        const height = 400;
+        const width = 520;
+        const margin = { top: 10, right: 30, bottom: 30, left: 30 };
 
         var diameter = 600;
-        var color = d3.scaleOrdinal(d3.schemeCategory20);
+        schema = ["#2d856b", "#1eba54", "#69b3a2", "#12eeaa", "#20d760"];
+        var color = d3.scaleOrdinal(schema);
 
-        var bubble = d3.pack(dataset)
-            .size([diameter, diameter])
-            .padding(1.5);
+        var bubble = d3.pack(data).size([diameter, diameter]).padding(3);
+        var bubbleArtist = d3.pack(dataArtist).size([diameter, diameter]).padding(3);
+        
+        // svg song data
+        var svg = d3
+          .select("body")
+          .append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter)
+          .attr("class", "bubble");
 
-        var svg = d3.select("body")
+        d3.select(self.frameElement).style("height", diameter + "px");
+        
+        document.getElementById("chart").appendChild(svg.node());
+        update(dataAt(year));
+
+
+        // svg artist data
+        var svgArtist = d3
+          .select("body")
+          .append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter)
+          .attr("class", "bubble");
+
+        d3.select(self.frameElement).style("height", diameter + "px");
+        
+        document.getElementById("chart_artist").appendChild(svgArtist.node());
+        updateArtist(dataAtArtist(year));
+
+        function wrap(text) {
+          
+        text.each(function() {
+          
+          var text = d3.select(this),
+              words = text.text().split(/\s+/).reverse(),
+              word,
+              line = [],
+              lineNumber = 0,
+              lineHeight = 0, // ems
+              y = text.attr("y"),
+              dy = parseFloat(text.attr("dy")),
+              tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+          while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > this.id*2) {
+              line.pop();
+              tspan.text(line.join(" "));
+              line = [word];
+              tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+          }
+
+        });
+      }
+
+        function update(data) {
+          var oldChild = document.getElementById("chart").lastElementChild;
+
+          var svg = d3
+            .select("body")
             .append("svg")
             .attr("width", diameter)
             .attr("height", diameter)
             .attr("class", "bubble");
 
-        var nodes = d3.hierarchy(dataset)
-            .sum(function(d) { return d.Count; });
-
-        var node = svg.selectAll(".node")
+          var nodes = d3.hierarchy({ children: data }).sum(function (d) {
+            return d.popularity_normalized;
+          });
+          var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+          var node = svg
+            .selectAll(".node")
             .data(bubble(nodes).descendants())
             .enter()
-            .filter(function(d){
-                console.log(d)
-                console.log(!d.children)
-                return  !d.children
+            .filter(function (d) {
+              return !d.children;
             })
             .append("g")
             .attr("class", "node")
-            .attr("transform", function(d) {
-                return "translate(" + d.x + "," + d.y + ")";
+            .attr("transform", function (d) {
+              return "translate(" + d.x + "," + d.y + ")";
             });
 
-        node.append("title")
-            .text(function(d) {
-                return d.Name + ": " + d.Count;
-            });
-
-        node.append("circle")
-            .attr("r", function(d) {
-                return d.r;
+          node
+            .append("circle")
+            .attr("r", function (d) {
+              return d.r;
             })
-            .style("fill", function(d,i) {
-                return color(i);
-            });
+            .style("fill", function (d, i) {
+              return color(i);
+            })
+            .on("mouseover", function(event, d) {
+             var a = d.data.artists;
+             var parsed_a = a.slice(2,a.length-2);
+             parsed_a = parsed_a.replace(/'/g, "");
 
-        node.append("text")
-            .attr("dy", ".2em")
+             
+             tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+             tooltip.html("Song: " + d.data.name + "<br/> Artists: " + parsed_a)
+             
+               .style("left", (event.pageX) + "px")
+               .style("top", (event.pageY - 28) + "px");
+
+
+             })
+           .on("mouseout", function(event, d) {
+             tooltip.transition()
+               .duration(500)
+               .style("opacity", 0);
+
+            });
+            
+            node
+            .append("text")
+            .attr("dy", "1em")
+            
             .style("text-anchor", "middle")
-            .text(function(d) {
-                return d.data.Name.substring(0, d.r / 3);
+            
+            .text(function (d) {
+              
+              return d.data.name;
             })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", function(d){
-                return d.r/5;
+            .attr("font-family", "Gill Sans", "Gill Sans MT")
+            .attr("font-size", function (d) {
+              // console.log(d.r)
+              return d.r/8;
             })
-            .attr("fill", "white");
-
-        node.append("text")
-            .attr("dy", "1.3em")
-            .style("text-anchor", "middle")
-            .text(function(d) {
-                return d.data.Count;
+            .attr("id", function (d) {
+              return d.r;
             })
-            .attr("font-family",  "Gill Sans", "Gill Sans MT")
-            .attr("font-size", function(d){
-                return d.r/5;
+            .attr("fill", "black")
+            .call(wrap);
+            
+          document.getElementById("chart").replaceChild(svg.node(), oldChild);
+        }
+
+        
+
+        // Update artist chart
+        function updateArtist(data) {
+        var oldChild = document.getElementById("chart_artist").lastElementChild;
+
+        var svg = d3
+          .select("body")
+          .append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter)
+          .attr("class", "bubble");
+
+        var nodes = d3.hierarchy({ children: data }).sum(function (d) {
+          return d.popularity_normalized;
+        });
+        var tooltip = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+        var node = svg
+          .selectAll(".node")
+          .data(bubbleArtist(nodes).descendants())
+          .enter()
+          .filter(function (d) {
+            return !d.children;
+          })
+          .append("g")
+          .attr("class", "node")
+          .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+
+        node
+          .append("circle")
+          .attr("r", function (d) {
+            return d.r;
+          })
+          .style("fill", function (d, i) {
+            return color(i);
+          })
+          .on("mouseover", function(event, d) {
+           tooltip.transition()
+             .duration(200)
+             .style("opacity", .9);
+           tooltip.html("Artist: " + d.data.artist)
+           
+             .style("left", (event.pageX) + "px")
+             .style("top", (event.pageY - 28) + "px");
+
+
+           })
+         .on("mouseout", function(event, d) {
+           tooltip.transition()
+             .duration(500)
+             .style("opacity", 0);
+
+          });
+
+        node
+          .append("text")
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .text(function (d) {
+            return d.data.artist;
+          })
+          .attr("font-family", "Gill Sans", "Gill Sans MT")
+          .attr("font-size", function (d) {
+            return d.r / 8;
+          })
+          .attr("id", function (d) {
+              return d.r;
             })
-            .attr("fill", "white");
+          .attr("fill", "black")
+          .call(wrap);
 
-        d3.select(self.frameElement)
-            .style("height", diameter + "px");
+          svg.on('click', (event, d)=>{
+            document.cookie = event.srcElement.__data__.data.artist;
+            window.location.href = './artist.html';
+          })
+        document.getElementById("chart_artist").replaceChild(svg.node(), oldChild);
+      }
+      });
+    });
 
+  </script>
+  </body>
 
-
-	</script>
-</body>
+  <!-- This adapted from Arvind's observable from lecture. https://observablehq.com/d/4c93c3a516d35624 -->
+  <!-- Great D3 intro resource: https://observablehq.com/@d3/learn-d3?collection=@d3/learn-d3 -->
 </html>
