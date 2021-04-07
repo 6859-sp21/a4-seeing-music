@@ -189,7 +189,9 @@
           .attr("y1", function(d) { return y(d.name); })
           .attr("y2", function(d) { return y(d.name); })
           .attr("stroke", "grey")
+
       svg.call(brush)
+
       // Circles
       const circle = svg.append("g")
          .attr("fill", "#69b3a2")
