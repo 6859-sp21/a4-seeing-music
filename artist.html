@@ -128,7 +128,7 @@
           .call(d3.axisTop(x))
           .selectAll("text")
           .attr("transform", "translate(25, -20)rotate(-45)")
-          .style("text-anchor", "end");
+          .style("text-anchor", "end")          
 
 
         function truncateLabel(text, width) {
@@ -160,6 +160,7 @@
           .domain(artistData.map(function(d) { return d.name; }))
           .range([ margin.top, height ])
           .padding(1);
+          
       svg.append("g")
           .call(d3.axisLeft(y))
           // .selectAll(".tick text") tried adding wrap
@@ -275,15 +276,6 @@
         }
       }
 
-<<<<<<< HEAD
-      // function makeGraphs(data, chartName, dataSelected){
-      //   let oldChild = null
-      //   let oldChild2 = null
-      //   if(document.getElementById(chartName) !== null){
-      //     oldChild = document.getElementById(chartName).lastElementChild;
-      //     oldChild2 = document.getElementById(`all${chartName}`).lastElementChild;
-      //   }
-=======
       function makeGraphs(data, chartName, dataSelected, isBrushed){
         let oldChild = null
         let oldChild2 = null
@@ -291,7 +283,6 @@
           oldChild = document.getElementById(chartName).lastElementChild;
           oldChild2 = document.getElementById(`all${chartName}`).lastElementChild;
         }
->>>>>>> bb65d6700cd3477055b694eb37b85651c9be34af
 
         // AVERAGE CHARTS append the svg object to the body of the page
         var margin2 = {top: 10, right: 0, bottom: 30, left: 0},
