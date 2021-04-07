@@ -132,7 +132,6 @@
 
 
         function truncateLabel(text, width) {
-          console.log(text)
           text.each(function() {
             var text = d3.select(this),
                   words = text.text().split(/\s+/).reverse(),
@@ -159,7 +158,7 @@
       // Y axis
       var y = d3.scaleBand()
           .domain(artistData.map(function(d) { return d.name; }))
-          .range([ 0, height ])
+          .range([ margin.top, height ])
           .padding(1);
       svg.append("g")
           .call(d3.axisLeft(y))
@@ -217,7 +216,7 @@
         });
       
 
-      update()
+      update(false)
       
 
       function brushed(event) {
@@ -234,22 +233,24 @@
               return brushed
             })
             circle.classed("not-selected", function(d){ return !isBrushed(coords, x(new Date(d.release_date)), y(d.name)) })
+            update(true)
           }else{
             selectedData = artistData
             circle.classed("selected", function(d){ return true })
             circle.classed("not-selected", function(d){ return false })
+            update(false)
           }     
 
           function isBrushed(coords, x, y){
             return coords[0][0] <= x && x <= coords[1][0] && coords[0][1] <= y && y <= coords[1][1]
           }
-          update()
+          
         } 
       }
 
       document.getElementById("chart").appendChild(svg.node());
 
-      function update(){
+      function update(isBrushed){
         // column titles for song information
         let songInfo = [{title: "Acousticness", value: 0}, {title: "Danceability", value: 0}, {title: "Key", value: 0}, {title:"Loudness", value: 0}, {title:"Tempo", value: 0}]
 
@@ -269,11 +270,12 @@
           })
 
           songInfo.forEach(s =>{
-              makeGraphs([s], s.title, selectedData)
+              makeGraphs([s], s.title, selectedData, isBrushed)
           })
         }
       }
 
+<<<<<<< HEAD
       // function makeGraphs(data, chartName, dataSelected){
       //   let oldChild = null
       //   let oldChild2 = null
@@ -281,6 +283,15 @@
       //     oldChild = document.getElementById(chartName).lastElementChild;
       //     oldChild2 = document.getElementById(`all${chartName}`).lastElementChild;
       //   }
+=======
+      function makeGraphs(data, chartName, dataSelected, isBrushed){
+        let oldChild = null
+        let oldChild2 = null
+        if(document.getElementById(chartName) !== null){
+          oldChild = document.getElementById(chartName).lastElementChild;
+          oldChild2 = document.getElementById(`all${chartName}`).lastElementChild;
+        }
+>>>>>>> bb65d6700cd3477055b694eb37b85651c9be34af
 
         // AVERAGE CHARTS append the svg object to the body of the page
         var margin2 = {top: 10, right: 0, bottom: 30, left: 0},
@@ -344,75 +355,83 @@
             return d.tempo
           }
         }
-        var svg = d3.create("svg")
-          .attr("viewBox", [-30, 0, width+50, height+20]);
-        
-        let fontSize = 5;
-        if(dataSelected.length < 5){
-          fontSize = 10
-        } else if(dataSelected.length < 10){
-          fontSize = 9
-        }else if(dataSelected.length < 15){
-          fontSize = 8
-        }else if(dataSelected.length < 20){
-          fontSize = 7
-        }else if(dataSelected.length < 30){
-          fontSize = 6
+
+        var svg = null;
+        if(isBrushed){ 
+          svg = d3.create("svg")
+            .attr("viewBox", [-30, 0, width+50, height+20]);
+          
+          let fontSize = 5;
+          if(dataSelected.length < 5){
+            fontSize = 10
+          } else if(dataSelected.length < 10){
+            fontSize = 9
+          }else if(dataSelected.length < 15){
+            fontSize = 8
+          }else if(dataSelected.length < 20){
+            fontSize = 7
+          }else if(dataSelected.length < 30){
+            fontSize = 6
+          }
+          // X axis
+          var x = d3.scaleBand()
+            .range([ margin2.left, width - margin2.right])
+            .domain(dataSelected.map(function(d) { return d.name; }))
+            .padding(0.1);
+          svg.append("g")
+            .attr("transform", `translate(0, ${height-margin2.bottom})`)
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+              .attr("transform", "translate(-10,0)rotate(-90)")
+              .style("font-size", `${fontSize}px`)
+              .style("text-anchor", "end");
+
+          let fontY = d3.max(dataSelected, d=> getDataType(d)).toString().length 
+          fontY = 10-(fontY/2)
+
+          // Add Y axis
+          var y = d3.scaleLinear()
+            .domain([0, d3.max(dataSelected, d=> getDataType(d))]).nice()
+            .range([ height-margin2.bottom, margin2.top]);
+          svg.append("g")
+            .call(d3.axisLeft(y))
+            .style("font-size", `${fontY}px`);
+
+          // Bars
+          svg.append("g")
+            .selectAll("mybar")
+            .data(dataSelected)
+            .enter()
+            .append("rect")
+              .attr("x", function(d) { return x(d.name); })
+              .attr("y", function(d) { return y(getDataType(d)); })
+              .attr("width", x.bandwidth())
+              .attr("height", function(d) {return y(0) - y(getDataType(d))})
+              .attr("fill", "#69b3a2")
+              .on("mouseover", function(event, d){
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", .9)
+            tooltip.html("Song: " + d.name + `<br/> ${chartName}: ` + getDataType(d))
+              .style("left", (event.pageX) + "px")
+              .style("top", (event.pageY - 28) + "px");
+          })
+          .on("mouseout", function(event, d) {
+            tooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
+
+          });
         }
-        // X axis
-        var x = d3.scaleBand()
-          .range([ margin2.left, width - margin2.right])
-          .domain(dataSelected.map(function(d) { return d.name; }))
-          .padding(0.1);
-        svg.append("g")
-          .attr("transform", `translate(0, ${height-margin2.bottom})`)
-          .call(d3.axisBottom(x))
-          .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-90)")
-            .style("font-size", `${fontSize}px`)
-            .style("text-anchor", "end");
-
-        let fontY = d3.max(dataSelected, d=> getDataType(d)).toString().length 
-        fontY = 10-(fontY/2)
-
-        // Add Y axis
-        var y = d3.scaleLinear()
-          .domain([0, d3.max(dataSelected, d=> getDataType(d))]).nice()
-          .range([ height-margin2.bottom, margin2.top]);
-        svg.append("g")
-          .call(d3.axisLeft(y))
-          .style("font-size", `${fontY}px`);
-
-        // Bars
-        svg.append("g")
-          .selectAll("mybar")
-          .data(dataSelected)
-          .enter()
-          .append("rect")
-            .attr("x", function(d) { return x(d.name); })
-            .attr("y", function(d) { return y(getDataType(d)); })
-            .attr("width", x.bandwidth())
-            .attr("height", function(d) {return y(0) - y(getDataType(d))})
-            .attr("fill", "#69b3a2")
-            .on("mouseover", function(event, d){
-          tooltip.transition()
-            .duration(200)
-            .style("opacity", .9)
-          tooltip.html("Song: " + d.name + `<br/> ${chartName}: ` + getDataType(d))
-             .style("left", (event.pageX) + "px")
-             .style("top", (event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(event, d) {
-          tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-
-        });
-
+        
+        let text = document.createElement("P");
+        let message = document.createTextNode("Start brushing to see individual song bar graphs.")
+        text.appendChild(message);
+        const node = (svg === null)? text: svg.node()
         if(oldChild2 === null){
-          document.getElementById(`all${chartName}`).appendChild(svg.node());
+          document.getElementById(`all${chartName}`).appendChild(node);
         }else{
-          document.getElementById(`all${chartName}`).replaceChild(svg.node(), oldChild2);
+          document.getElementById(`all${chartName}`).replaceChild(node, oldChild2);
         }
       }
 
