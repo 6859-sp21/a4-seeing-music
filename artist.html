@@ -4,24 +4,24 @@
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
   </head>
-  <body>
+  <body style="background-color:rgba(0, 0, 0, 0.9); background-image: url('spotify.png'); background-position: center; background-size:60%; background-blend-mode:  soft-light ; " >
     <button id="back" type ="button">Back to top songs and artists</button>
-    <h1 id = "artistName" style="font-family: 'Helvetica Neue', sans-serif; margin-left: 10;"></h1>
+    <h1 id = "artistName" style="color:white; font-family: 'Helvetica Neue', sans-serif; margin-left: 10;"></h1>
     <div style="display: flex;">
-      <div style="flex: 1; margin-left: 10; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
-        <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
-        <p style = "font-size: 14; margin-top: -10;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
+      <div style="color:white; flex: 1; margin-left: 10; font-family: 'Helvetica Neue', sans-serif; font-weight:normal; ">
+        <p style = "font-size: 25; text-decoration: underline overline white; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
+        <p style = "color:white; font-size: 14; margin-top: -10;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
         <div id="chart"></div>
       </div>
-      <div style="flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
-        <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Information</p>
-        <p style = "font-size: 20;" > Acousticness </p>
-        <p style = "font-size: 14; margin-top: -10;" > The relative metric of the track being acoustic. </p>
+      <div style="color:white; flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: normal; ">
+        <p style = "color:white; font-size: 25; text-decoration: underline overline white; text-decoration-thickness: 0.5px;"> Song Information</p>
+        <p style = "color:white; font-size: 20;" > Acousticness </p>
+        <p style = "color:white; font-size: 14; margin-top: -10;" > The relative metric of the track being acoustic. </p>
         <div style="display: flex; margin-top: 20;">
-          <div id="Acousticness" style="flex: 1;"></div>
-          <div id="allAcousticness" style="flex: 2;"></div>
+          <div id="Acousticness" style="color:white; flex: 1;"></div>
+          <div id="allAcousticness" style="color:white; flex: 2;"></div>
         </div>
-        <p style = "font-size: 20;" > Danceability </p>
+        <p style = "color:white; font-size: 20;" > Danceability </p>
         <p style = "font-size: 14; margin-top: -10;" > The relative measurement of the track being danceable. </p>
         <div style="display: flex;">
           <div id="Danceability" style="flex: 1;"></div>
@@ -71,6 +71,19 @@
         opacity: 0.5 !important;
         stroke: gray;
         fill: white;
+      }
+      button{
+        color: black;
+        background-color: white; 
+        font-size:larger; 
+        border-radius: 12px;
+        font-family: 'Helvetica Neue', sans-serif; 
+        font-weight: normal;
+        padding: 8px 20px
+      }
+      button:hover{
+        background-color:#69b3a2;
+        color:white;
       }
     </style>
     <script>
