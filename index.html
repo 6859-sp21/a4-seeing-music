@@ -8,6 +8,7 @@
 
     <h1 style="color:whitesmoke; font-size: 1.5cm; text-align: center;" >Spotify Top Songs & Artists</h1>
     <a style="position: fixed; bottom: 10; right: 10; color:white" href="https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks" target="_blank">Source: Kaggle Spotify Dataset</a>
+    
 
     <p id="textInputOther" value="" style="color:whitesmoke; font-size: larger;">
         Top
@@ -44,7 +45,7 @@
       class="slider"
     />
 
-    
+    <h2 id="rectangle"></h2>
 
     <table cellpadding='50'>
         <tr>
@@ -115,6 +116,12 @@ text{
     animation: spin 2s linear infinite;
     margin-left: 150;
     margin-top: 70;
+}
+#rectangle{
+  height : 30px;
+  width : 300px;
+  background-image: linear-gradient(to right, #12eeaa, #20d760, #1eba54,#69b3a2, #2d856b);
+  color: white;
 }
 
 @keyframes spin {
@@ -220,7 +227,7 @@ text{
         const margin = { top: 10, right: 30, bottom: 30, left: 30 };
 
         var diameter = 600;
-        schema = ["#2d856b", "#1eba54", "#69b3a2", "#12eeaa", "#20d760"];
+        schema = ["#12eeaa", "#20d760", "#1eba54", "#69b3a2", "#2d856b"];
         var color = d3.scaleOrdinal(schema);
 
         var bubble = d3.pack(data).size([diameter, diameter]).padding(3);
