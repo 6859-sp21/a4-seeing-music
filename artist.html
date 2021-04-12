@@ -92,10 +92,11 @@
         color: black;
         background-color: white; 
         font-size:larger; 
-        border-radius: 12px;
+        border-radius: 10px;
         font-family: 'Helvetica Neue', sans-serif; 
         font-weight: normal;
-        padding: 8px 20px
+        padding: 8px 15px;
+        font-size: 15px;
       }
       button:hover{
         background-color:#69b3a2;
@@ -138,10 +139,10 @@
 
       var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0);
+        .style("opacity", 0)
 
       const brush = d3.brush()
-          .extent([[-20, 0], [width, height-margin.bottom]])
+          .extent([[-20, 0], [width, height]])
           .on("start brush end", brushed);
 
         
@@ -226,6 +227,7 @@
           .attr("stroke", "grey")
 
       svg.call(brush)
+         .on("dblclick", reset);
 
       // Circles
       const circle = svg.append("g")
@@ -256,6 +258,13 @@
 
       update(false)
       
+      function reset(event){
+        selectedData = artistData
+        circle.classed("selected", function(d){ return true })
+        circle.classed("not-selected", function(d){ return false })
+        update(false)
+        svg.call(brush.clear)
+      }
 
       function brushed(event) {
         const coords = event.selection;
@@ -273,10 +282,7 @@
             circle.classed("not-selected", function(d){ return !isBrushed(coords, x(new Date(d.release_date)), y(d.name)) })
             update(true)
           }else{
-            selectedData = artistData
-            circle.classed("selected", function(d){ return true })
-            circle.classed("not-selected", function(d){ return false })
-            update(false)
+            reset(event)
           }     
 
           function isBrushed(coords, x, y){
