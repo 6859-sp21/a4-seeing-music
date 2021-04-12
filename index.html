@@ -3,7 +3,7 @@
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v6.js"></script>
   </head>
-
+<div class="body-container">
   <body style="background-color:rgba(0, 0, 0, 0.9); background-image: url('spotify.png'); background-position: center; background-size:60%; background-blend-mode:  soft-light ; " >
 
     <h1 style="color:whitesmoke; font-size: 1.5cm; text-align: center;" >Spotify Top Songs & Artists</h1>
@@ -26,7 +26,6 @@
         step="1"
         class="slider"
       />
-    </div>
     <p id="textInput" value="" style="color:whitesmoke; font-size: larger;">
       Of
       <output for="mySlider" id="year" style="color:whitesmoke;  font-size: larger; font-weight: bolder;">2020</output>
@@ -43,27 +42,20 @@
       step="1"
       class="slider"
     />
-
-    
-
-    <table cellpadding='50'>
-        <tr>
-          <td> <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
-            <div class="loader" id="loaderSongs"></div> 
-           <div id="chart" style="width: 520px; height: 420px;"></div></td>
-          
-           <td><h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
+  <div class ="chart-container">
+          <div class ="single-chart" style="margin-right: 40">
+          <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
+            <div class="loader" id="loaderSongs" style="margin-top: 120;"></div> 
+           <div id="chart" style="width: 520px; height: 420px; margin-top: 30;"></div>
+          </div>
+          <div class ="single-chart" style="margin-left: 40">
+           <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
               <p style="color:whitesmoke; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
-              <div class="loader" id="loaderArtist"></div>
-              <div id="chart_artist" style="width: 520px; height: 420px;"></div></td>
-        </tr>
-    </table>
-    <script>
-      function doneLoading() {
-        document.getElementById("loaderArtist").style.display = "none";
-        document.getElementById("loaderSongs").style.display = "none";
-     };
-    </script>
+              <div class="loader" id="loaderArtist" style="margin-top: 70;"></div>
+              <div id="chart_artist" style="width: 520px; height: 420px;"></div>
+          </div>
+  </div>
+  </div>
 <style>
        div.tooltip {
         position: absolute;
@@ -114,15 +106,34 @@ text{
     height: 150;
     animation: spin 2s linear infinite;
     margin-left: 150;
-    margin-top: 70;
+    
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+.body-container{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
+.chart-container{
+  display:flex;
+  justify-content: space-between;
+}
+
+.single-chart{
+  display: flex;
+  flex-direction: column;
+}
 </style>
     <script>
+      function doneLoading() {
+        document.getElementById("loaderArtist").style.display = "none";
+        document.getElementById("loaderSongs").style.display = "none";
+     };
+
       // Bubble chart for songs
       d3.csv("data/data.csv").then((allData) => {d3.csv("data/data_yearly_artist_popularity_cleaned.csv").then((allDataArtist) => {
         // Filter top 10 songs of 2020
@@ -343,16 +354,12 @@ text{
             node
             .append("text")
             .attr("dy", "1em")
-            
             .style("text-anchor", "middle")
-            
             .text(function (d) {
-              
               return d.data.name;
             })
             .attr("font-family", "Gill Sans", "Gill Sans MT")
             .attr("font-size", function (d) {
-              // console.log(d.r)
               return d.r/8;
             })
             .attr("id", function (d) {
