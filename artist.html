@@ -11,6 +11,7 @@
       <div style="flex: 1; margin-left: 10; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
         <p style = "font-size: 25; text-decoration: underline overline gray; text-decoration-thickness: 0.5px;"> Song Release Dates</p>
         <p style = "font-size: 14; margin-top: -10;" > Brushing is enabled to specify which songs you would like to see in detail on the right. </p>
+        <div class="loader" id="loader"></div> 
         <div id="chart"></div>
       </div>
       <div style="flex: 1; margin-left: 100; font-family: 'Helvetica Neue', sans-serif; font-weight: lighter; ">
@@ -72,8 +73,27 @@
         stroke: gray;
         fill: white;
       }
+      .loader {
+  border: 30px solid white;
+    border-top: 30px solid grey;
+    border-radius: 50%;
+    width: 150;
+    height: 150;
+    animation: spin 2s linear infinite;
+    margin-left: 150;
+    margin-top: 70;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
     </style>
     <script>
+      function doneLoading() {
+        document.getElementById("loader").style.display = "none";
+     };
+
       document.getElementById("back").onclick = function() {window.location.href = './index.html';};
 
       // Load data from a URL. You can also have the json file downloaded.
@@ -252,7 +272,7 @@
           
         } 
       }
-
+      doneLoading()
       document.getElementById("chart").appendChild(svg.node());
 
       function update(isBrushed){

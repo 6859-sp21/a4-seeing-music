@@ -3,6 +3,7 @@
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v6.js"></script>
   </head>
+
   <body style="background-color:rgba(0, 0, 0, 0.9); background-image: url('spotify.png'); background-position: center; background-size:60%; background-blend-mode:  soft-light ; " >
 
     <h1 style="color:whitesmoke; font-size: 2.2cm; text-align: center;" >Spotify Top Songs & Artists</h1>
@@ -42,18 +43,26 @@
       class="slider"
     />
 
+    
 
     <table cellpadding='50'>
         <tr>
           <td> <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
+            <div class="loader" id="loaderSongs"></div> 
            <div id="chart" style="width: 520px; height: 420px;"></div></td>
           
            <td><h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
               <p style="color:whitesmoke; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
+              <div class="loader" id="loaderArtist"></div>
               <div id="chart_artist" style="width: 520px; height: 420px;"></div></td>
         </tr>
     </table>
-
+    <script>
+      function doneLoading() {
+        document.getElementById("loaderArtist").style.display = "none";
+        document.getElementById("loaderSongs").style.display = "none";
+     };
+    </script>
 <style>
        div.tooltip {
         position: absolute;
@@ -94,6 +103,22 @@ body {
 text{
   font-family: 'Helvetica Neue', sans-serif;
   overflow-wrap: normal; 
+}
+
+.loader {
+  border: 30px solid white;
+    border-top: 30px solid grey;
+    border-radius: 50%;
+    width: 150;
+    height: 150;
+    animation: spin 2s linear infinite;
+    margin-left: 150;
+    margin-top: 70;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
     <script>
@@ -209,6 +234,7 @@ text{
 
         d3.select(self.frameElement).style("height", diameter + "px");
         
+        doneLoading();
         document.getElementById("chart").appendChild(svg.node());
         update(dataAt(year));
 
