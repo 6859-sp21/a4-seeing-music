@@ -21,3 +21,7 @@ Overall, having the embedded graphs that can be reached through clicks helps lea
 
 ## Overview of Development Process
 An overview of your development process. Describe how the work was split among the team members. Include a commentary on the development process, including answers to the following questions: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?
+
+We began by outlining our visualization based on tasks to be completed. We tried to split the work as equally as possible, with each person taking the reigns on a section of the visualization: Rachael led the development of the artists page, while Alizée and Claire led the development of the front page. 
+
+Overall, developing our application took at least 20hr per person. The beginning of the development process involved a lot of familiarizing with the data and the charts we utilized. As we continued to build the application, we ran into random obstacles such as parsing the data, wrapping text in each bubble, adapting each bubble's text to its size, etc. Overcoming many of these small obstacles required a lot of time.
