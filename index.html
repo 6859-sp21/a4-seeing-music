@@ -8,6 +8,7 @@
 
     <h1 style="color:whitesmoke; font-size: 1.5cm; text-align: center;" >Spotify Top Songs & Artists</h1>
     <a style="position: fixed; bottom: 10; right: 10; color:white" href="https://www.kaggle.com/yamaerenay/spotify-dataset-19212020-160k-tracks" target="_blank">Source: Kaggle Spotify Dataset</a>
+    
 
     <p id="textInputOther" value="" style="color:whitesmoke; font-size: larger;">
         Top
@@ -46,16 +47,25 @@
           <div class ="single-chart" style="margin-right: 40">
           <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Top Songs</h1>
             <div class="loader" id="loaderSongs" style="margin-top: 120;"></div> 
-           <div id="chart" style="width: 520px; height: 420px; margin-top: 30;"></div>
+           <div id="chart" style="margin-top: 30;"></div>
+
           </div>
           <div class ="single-chart" style="margin-left: 40">
            <h1 style="color:whitesmoke;  font-size: 0.8cm; text-align: center;" >Artists</h1>
               <p style="color:whitesmoke; font-size: 0.5cm; text-align: center;">Click on an artist to learn more about their songs!</p>
               <div class="loader" id="loaderArtist" style="margin-top: 70;"></div>
-              <div id="chart_artist" style="width: 520px; height: 420px;"></div>
+              <div id="chart_artist" ></div>
           </div>
+          <div class="legend-container">
+          <p style="margin-bottom:5; margin-top:220; color:white;"> Less popular&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;More popular </p>
+          <div id="rectangle"></div>
+        </div>
+
   </div>
   </div>
+
+
+
 <style>
        div.tooltip {
         position: absolute;
@@ -108,6 +118,14 @@ text{
     margin-left: 150;
     
 }
+#rectangle{
+  height : 30px;
+  width : 300px;
+  background-image: linear-gradient(to right,#2d856b,#69b3a2, #1eba54, #20d760, #12eeaa);
+  color: white;
+  font-size: normal;
+  margin-top:none;
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
@@ -126,6 +144,11 @@ text{
 .single-chart{
   display: flex;
   flex-direction: column;
+}
+.legend-container{
+  display:flex;
+  flex-direction: column;
+  align-items: space-around;
 }
 </style>
     <script>
@@ -231,7 +254,7 @@ text{
         const margin = { top: 10, right: 30, bottom: 30, left: 30 };
 
         var diameter = 600;
-        schema = ["#2d856b", "#1eba54", "#69b3a2", "#12eeaa", "#20d760"];
+        schema = ["#12eeaa", "#20d760", "#1eba54", "#69b3a2", "#2d856b"];
         var color = d3.scaleOrdinal(schema);
 
         var bubble = d3.pack(data).size([diameter, diameter]).padding(3);
