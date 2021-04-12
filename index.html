@@ -159,10 +159,11 @@ text{
               return d3.descending(+a.popularity, +b.popularity);
             })
             .slice(0, parseInt(rangeOther));
+
           var popularities = [];
           var min = 100;
           var max = 0;
-
+    
           for (var i = 0; i < data.length; i++) {
             popularities.push(data[i].popularity);
           }
@@ -315,7 +316,11 @@ text{
               return d.r;
             })
             .style("fill", function (d, i) {
-              return color(i);
+              var num_colors = 5;
+              var num_songs = parseInt(rangeOther);
+              var each = Math.ceil(num_songs/num_colors);
+              var j = Math.floor(i/each);
+              return color(j);
             })
             .on("mouseover", function(event, d) {
              var a = d.data.artists;
@@ -402,7 +407,11 @@ text{
             return d.r;
           })
           .style("fill", function (d, i) {
-            return color(i);
+              var num_colors = 5;
+              var num_artists = parseInt(rangeOther);
+              var each = Math.ceil(num_artists/num_colors);
+              var j = Math.floor(i/each);
+              return color(j);
           })
           .on("mouseover", function(event, d) {
            tooltip.transition()
