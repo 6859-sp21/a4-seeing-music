@@ -14,6 +14,8 @@ First and foremost, we performed exploratory data analysis to explore different 
 
 On the artists page, we thought it would be most useful to see songs in relation to each of the artists. A lollipop chart was best to show a timeline of songs. Bar charts are a great way to depict all of the different song attributes, and even resemble music volume bars. We chose to exclude certain data that was inconsistent, such as the genre of each artist. However, this definitely also excluded some potentially interesting information from our visualization.
 
+We decided on making our visualization rather exploratory for the user, than telling a story. This decision was made because there is a lot of important information about each song that we wanted to show. The dataset however did not contain any information about song albums, song backstory, and the genres for each song were very inconsistent, which is why our visualization doesn't show any of these.
+
 Overall, having the embedded graphs that can be reached through clicks helps lead users through the different components of the visualization. The interactivity that allows users to vary year, the number of top artists and songs, and the number of songs on the artists page, allows for more user engagement.
 
 
