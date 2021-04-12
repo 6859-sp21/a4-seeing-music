@@ -202,8 +202,6 @@
           
       svg.append("g")
           .call(d3.axisLeft(y))
-          // .selectAll(".tick text") tried adding wrap
-          //   .call(wrap, margin.left)
           .selectAll(".tick text") 
           .call(truncateLabel, margin.left)
           
@@ -256,8 +254,7 @@
             .duration(500)
             .style("opacity", 0);
 
-        });
-      
+        })
 
       update(false)
       
@@ -271,6 +268,7 @@
 
       function brushed(event) {
         const coords = event.selection;
+        // let count = 1;
         if(coords){
           const [[x0, y0], [x1, y1]] = coords;
           if(coords[0][0] !== coords[1][0] && coords[0][1] !== coords[1][1]){
@@ -279,6 +277,13 @@
               let brushed = isBrushed(coords, x(new Date(d.release_date)), y(d.name));
               if(brushed){
                 selectedData.push(d)
+                // circle.append("text")
+                // .attr("dy", "0.5em")
+                // .style("text-anchor", "middle")
+                // .text(`${count}`)
+                // .attr("font-size", "10")
+                // .attr("fill", "black");
+                // count++;
               }
               return brushed
             })
@@ -418,15 +423,18 @@
             fontSize = 6
           }
           // X axis
+          let count = 0;
           var x = d3.scaleBand()
             .range([ margin2.left, width - margin2.right])
-            .domain(dataSelected.map(function(d) { return d.name; }))
+            .domain(dataSelected.map(function(d) { 
+              count++;
+              return count; }))
             .padding(0.1);
           svg.append("g")
             .attr("transform", `translate(0, ${height-margin2.bottom})`)
             .call(d3.axisBottom(x))
             .selectAll("text")
-              .attr("transform", "translate(-10,0)rotate(-90)")
+              .attr("transform", "translate(-10,0)")
               .style("font-size", `${fontSize}px`)
               .style("text-anchor", "end");
 
@@ -497,7 +505,6 @@
               tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
             }
           }
-
         });
       }
 
