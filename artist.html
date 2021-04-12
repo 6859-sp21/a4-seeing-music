@@ -409,6 +409,7 @@
         if(isBrushed){ 
           svg = d3.create("svg")
             .attr("viewBox", [-30, 0, width+50, height+20]);
+            // .call(zoom);
           
           let fontSize = 5;
           if(dataSelected.length < 5){
@@ -445,14 +446,17 @@
           svg.append("g")
             .call(d3.axisLeft(y).tickFormat(d3.format(tickFormat(true))))
             .style("font-size", `${tickFormat(false)}px`);
-
+          
+          count = 0;
           // Bars
           svg.append("g")
             .selectAll("mybar")
             .data(dataSelected)
             .enter()
             .append("rect")
-              .attr("x", function(d) { return x(d.name); })
+              .attr("x", function(d) { 
+                count++;
+                return x(count); })
               .attr("y", function(d) { return y(getDataType(d)); })
               .attr("width", x.bandwidth())
               .attr("height", function(d) {return y(0) - y(getDataType(d))})
@@ -482,30 +486,22 @@
         }else{
           document.getElementById(`all${chartName}`).replaceChild(node, oldChild2);
         }
-      }
 
-      function wrap(text, width) {
-        text.each(function() {
-          var text = d3.select(this),
-              words = text.text().split(/\s+/).reverse(),
-              word,
-              line = [],
-              lineNumber = 0,
-              lineHeight = 1.1, // ems
-              y = text.attr("y"),
-              dy = parseFloat(text.attr("dy")),
-              tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-          while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
-              line.pop();
-              tspan.text(line.join(" "));
-              line = [word];
-              tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-            }
+        function zoom(svg) {
+          const extent = [[margin2.left, margin2.top], [width - margin2.right, height - margin2.top]];
+
+          svg.call(d3.zoom()
+              .scaleExtent([1, 8])
+              .translateExtent(extent)
+              .extent(extent)
+              .on("zoom", zoomed));
+
+          function zoomed(event) {
+            x.range([margin2.left, width - margin2.right].map(d => event.transform.applyX(d)));
+            svg.selectAll(".bars rect").attr("x", d => x(d.name)).attr("width", x.bandwidth());
+            svg.selectAll(".x-axis").call(x);
           }
-        });
+        }
       }
 
       });
