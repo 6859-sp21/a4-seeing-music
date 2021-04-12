@@ -268,28 +268,28 @@ text{
         function wrap(text) {
           
         text.each(function() {
-          
           var text = d3.select(this),
               words = text.text().split(/\s+/).reverse(),
+              count = 1,
               word,
               line = [],
               lineNumber = 0,
               lineHeight = 0, // ems
               y = text.attr("y"),
-              dy = parseFloat(text.attr("dy")),
-              tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+              tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y);
           while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
             if (tspan.node().getComputedTextLength() > this.id*2) {
+              count++;
               line.pop();
               tspan.text(line.join(" "));
               line = [word];
-              tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+              tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + "1em").text(word);
             }
           }
-
         });
+        
       }
 
         function update(data) {
@@ -358,14 +358,15 @@ text{
             
             node
             .append("text")
-            .attr("dy", "1em")
+            .attr("dy", "0.5em")
             .style("text-anchor", "middle")
             .text(function (d) {
               return d.data.name;
             })
             .attr("font-family", "Gill Sans", "Gill Sans MT")
             .attr("font-size", function (d) {
-              return d.r/8;
+              console.log(this.getComputedTextLength())
+              return (d.r/5);
             })
             .attr("id", function (d) {
               return d.r;
@@ -447,7 +448,7 @@ text{
           })
           .attr("font-family", "Gill Sans", "Gill Sans MT")
           .attr("font-size", function (d) {
-            return d.r / 8;
+            return d.r / 5;
           })
           .attr("id", function (d) {
               return d.r;
