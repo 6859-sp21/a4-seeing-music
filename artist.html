@@ -268,7 +268,7 @@
 
       function brushed(event) {
         const coords = event.selection;
-        // let count = 1;
+        
         if(coords){
           const [[x0, y0], [x1, y1]] = coords;
           if(coords[0][0] !== coords[1][0] && coords[0][1] !== coords[1][1]){
@@ -277,13 +277,6 @@
               let brushed = isBrushed(coords, x(new Date(d.release_date)), y(d.name));
               if(brushed){
                 selectedData.push(d)
-                // circle.append("text")
-                // .attr("dy", "0.5em")
-                // .style("text-anchor", "middle")
-                // .text(`${count}`)
-                // .attr("font-size", "10")
-                // .attr("fill", "black");
-                // count++;
               }
               return brushed
             })
@@ -296,7 +289,7 @@
           function isBrushed(coords, x, y){
             return coords[0][0] <= x && x <= coords[1][0] && coords[0][1] <= y && y <= coords[1][1]
           }
-          
+
         } 
       }
       doneLoading()
@@ -431,13 +424,20 @@
               count++;
               return count; }))
             .padding(0.1);
+
+          count = 0;
           svg.append("g")
             .attr("transform", `translate(0, ${height-margin2.bottom})`)
             .call(d3.axisBottom(x))
             .selectAll("text")
+              .data(dataSelected)
               .attr("transform", "translate(-10,0)")
               .style("font-size", `${fontSize}px`)
-              .style("text-anchor", "end");
+              .style("text-anchor", "end")
+              .text(d => {
+                let s = (x.bandwidth()/10 < 1)? 1: x.bandwidth()/10; 
+                return (d.name.length > x.bandwidth()/10)? `${d.name.substring(0,s)}...`: d.name;
+              })
 
           // Add Y axis
           var y = d3.scaleLinear()
